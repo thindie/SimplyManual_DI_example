@@ -31,7 +31,11 @@ class DependenciesProvider private constructor() {
         fun getDependenciesProvider(): DependenciesProvider
     }
 
-    private val router = AppRouter()
+    private lateinit var router : AppRouter
+
+    init {
+        AppRouter.inject(this)
+    }
 
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -106,5 +110,9 @@ class DependenciesProvider private constructor() {
 
     fun inject(activity: MainActivity){
         activity.appRouter = router
+    }
+
+    fun setAppRouter(appRouter: AppRouter) {
+        this.router = appRouter
     }
 }

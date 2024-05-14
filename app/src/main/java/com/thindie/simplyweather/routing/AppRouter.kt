@@ -3,9 +3,10 @@ package com.thindie.simplyweather.routing
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import com.thindie.simplyweather.di.DependenciesProvider
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-class AppRouter {
+class AppRouter private constructor(){
     private val _routeEvent: MutableSharedFlow<RouteEvent> = MutableSharedFlow()
     val routeFlow
         get() = _routeEvent
@@ -15,6 +16,11 @@ class AppRouter {
         data class DetailPlace(val latitude: String, val longitude: String) : RouteEvent()
         data object AllPlaces : RouteEvent()
         data object AddPlace : RouteEvent()
+    }
+    companion object {
+        fun inject(dependenciesProvider: DependenciesProvider){
+            dependenciesProvider.setAppRouter(AppRouter())
+        }
     }
 }
 
