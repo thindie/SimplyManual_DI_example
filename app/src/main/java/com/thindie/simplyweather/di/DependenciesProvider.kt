@@ -22,12 +22,12 @@ class DependenciesProvider private constructor() {
 
     companion object {
         fun getInstance(dependenciesHolder: DependenciesHolder) {
-            dependenciesHolder.setDependenciesProvider(dependenciesHolder)
+            dependenciesHolder.setDependenciesProvider(DependenciesProvider())
         }
     }
 
     interface DependenciesHolder {
-        fun setDependenciesProvider(dependenciesHolder: DependenciesHolder)
+        fun setDependenciesProvider(dependenciesProvider: DependenciesProvider)
         fun getDependenciesProvider(): DependenciesProvider
     }
 
@@ -81,20 +81,30 @@ class DependenciesProvider private constructor() {
         }
     }
 
-    val detailPlaceViewModelFactory = object : ViewModelProvider.Factory {
+    private lateinit var longitude: String
+    private lateinit var latitude: String
+
+    private val detailPlaceViewModelFactory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(
             modelClass: Class<T>,
         ): T {
             return DetailPlaceViewModel(
                 repository = repository,
-                routeFlow = router.routeFlow
+                routeFlow = router.routeFlow,
+                latitude = latitude,
+                longitude = longitude
             ) as T
         }
+    }
+
+    fun getDetailScreenViewModelFactory(latitude: String, longitude: String) : ViewModelProvider.Factory {
+        this.latitude = latitude
+        this.longitude = longitude
+        return detailPlaceViewModelFactory
     }
 
     fun inject(activity: MainActivity){
         activity.appRouter = router
     }
-
 }

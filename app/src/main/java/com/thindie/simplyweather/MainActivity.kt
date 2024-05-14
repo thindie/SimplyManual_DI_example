@@ -1,18 +1,21 @@
 package com.thindie.simplyweather
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.thindie.simplyweather.di.DependenciesProvider
 import com.thindie.simplyweather.routing.AppRouter
+import com.thindie.simplyweather.routing.onRouteEvent
 import com.thindie.simplyweather.ui.theme.SimplyWeatherTheme
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), DependenciesProvider.DependenciesHolder {
 
     private lateinit var navController: NavHostController
     lateinit var appRouter: AppRouter
@@ -24,7 +27,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SimplyWeatherTheme {
+                navController = rememberNavController()
                 ObserveNavigation()
+                WeatherApp(
+                    navHostController = navController,
+                )
             }
         }
     }
@@ -34,15 +41,16 @@ class MainActivity : ComponentActivity() {
         LaunchedEffect(navController) {
             appRouter
                 .routeFlow
-                .onEach {
-                    when(it){
-                        AppRouter.RouteEvent.AddPlace -> TODO()
-                        AppRouter.RouteEvent.AllPlaces -> TODO()
-                        AppRouter.RouteEvent.Back -> TODO()
-                        is AppRouter.RouteEvent.DetailPlace -> TODO()
-                    }
-                }
+                .onEach(navController::onRouteEvent)
                 .launchIn(this)
         }
+    }
+
+    override fun setDependenciesProvider(dependenciesProvider: DependenciesProvider) {
+        /*ignore*/
+    }
+
+    override fun getDependenciesProvider(): DependenciesProvider {
+        return (application as DependenciesProvider.DependenciesHolder).getDependenciesProvider()
     }
 }

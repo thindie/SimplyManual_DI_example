@@ -7,15 +7,18 @@ class WeatherApplication : Application(), DependenciesProvider.DependenciesHolde
 
     private lateinit var dependenciesProvider: DependenciesProvider
 
-    override fun setDependenciesProvider(dependenciesHolder: DependenciesProvider.DependenciesHolder) {
-        if (::dependenciesProvider.isInitialized){
-           /*ignore*/
+    override fun setDependenciesProvider(dependenciesProvider: DependenciesProvider) {
+        if (!::dependenciesProvider.isInitialized) {
+           this.dependenciesProvider = dependenciesProvider
+        } else {
+            /*ignore*/
         }
-        else DependenciesProvider.getInstance(this)
     }
 
     override fun getDependenciesProvider(): DependenciesProvider {
-       setDependenciesProvider(this)
+        if (!::dependenciesProvider.isInitialized) {
+            DependenciesProvider.getInstance(this)
+        }
         return dependenciesProvider
     }
 
