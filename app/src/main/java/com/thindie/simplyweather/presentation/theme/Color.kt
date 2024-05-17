@@ -1,4 +1,4 @@
-package com.thindie.simplyweather.ui.theme
+package com.thindie.simplyweather.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -10,7 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.thindie.simplyweather.di.DependenciesProvider
 import com.thindie.simplyweather.routing.AppRouter
 import com.thindie.simplyweather.routing.onRouteEvent
-import com.thindie.simplyweather.ui.theme.SimplyWeatherTheme
+import com.thindie.simplyweather.presentation.theme.SimplyWeatherTheme
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 

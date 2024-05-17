@@ -1,4 +1,4 @@
-package com.thindie.simplyweather.ui.theme
+package com.thindie.simplyweather.presentation.theme
 
 import android.app.Activity
 import android.os.Build
@@ -57,8 +57,8 @@ fun SimplyWeatherTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            window.statusBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

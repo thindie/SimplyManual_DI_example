@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -19,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +41,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.thindie.simplyweather.di.DependenciesProvider
+import com.thindie.simplyweather.presentation.MVIScaffold
+import com.thindie.simplyweather.presentation.PrimaryButton
 import com.thindie.simplyweather.presentation.TransitionState
 import com.thindie.simplyweather.presentation.add_place.event.AddPlaceScreenEvent
 import com.thindie.simplyweather.presentation.add_place.viewmodel.AddPlaceViewModel
@@ -75,142 +75,150 @@ private fun Screen(viewModel: AddPlaceViewModel) {
             initialValue = AddPlaceState(),
             minActiveState = Lifecycle.State.RESUMED
         )
-    Column(
-        modifier = Modifier
-            .verticalScroll(state = rememberScrollState())
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .imePadding()
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        when (state.transitionState) {
-            TransitionState.None -> {
-                CircularProgressIndicator(strokeWidth = 1.5.dp)
+    MVIScaffold(
+        topBar = {
+            IconButton(onClick = { viewModel.onEvent(AddPlaceScreenEvent.OnClickBack) }) {
+                Icon(
+                    painter = rememberVectorPainter(image = Icons.Default.ArrowBack),
+                    contentDescription = "back click"
+                )
             }
-
-            else -> {
-                IconButton(
-                    modifier = Modifier.align(Alignment.Start),
-                    onClick = { viewModel.onEvent(AddPlaceScreenEvent.OnClickBack) }
-                ) {
-                    Icon(
-                        painter = rememberVectorPainter(Icons.Default.ArrowBack),
-                        contentDescription = "backArrow"
-                    )
+        },
+        topBarPlaceHolder = {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                strokeWidth = 1.5.dp
+            )
+        },
+        shouldShowTopBar = state.transitionState == TransitionState.Content
+    ) {
+        Column(
+            modifier = it
+                .verticalScroll(state = rememberScrollState())
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .imePadding()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            when (state.transitionState) {
+                TransitionState.None -> {
+                    CircularProgressIndicator(strokeWidth = 1.5.dp)
                 }
-                HeightSpacer(dp = 32.dp)
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .height(64.dp),
-                    shadowElevation = 8.dp,
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+
+                else -> {
+                    HeightSpacer(dp = 16.dp)
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(64.dp),
+                        shadowElevation = 8.dp,
+                        tonalElevation = 8.dp,
+                        shape = MaterialTheme.shapes.medium
                     ) {
-                        Text(
-                            text = "Add new location",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Black
-                        )
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Add new location",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.Black
+                            )
+                        }
                     }
+                    HeightSpacer(dp = 48.dp)
+                    AddPlaceOutlinedTextField(
+                        value = state.placeTitle,
 
-                }
-                HeightSpacer(dp = 48.dp)
-                AddPlaceOutlinedTextField(
-                    value = state.placeTitle,
+                        onValueChange = {
+                            viewModel.onEvent(
+                                AddPlaceScreenEvent.PlaceNameUpdate(it)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        isError = state.titleError != null,
+                        transitionState = state.transitionState,
+                        onClickTrailingIcon = {
+                            viewModel.onEvent(
+                                AddPlaceScreenEvent.PlaceNameUpdate("")
+                            )
+                        },
+                        onError = {
+                            Text(text = "title cannot be blank")
+                        },
+                        placeHolder = {
+                            Text(
+                                text = "location..",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    )
+                    HeightSpacer(dp = 8.dp)
+                    AddPlaceOutlinedTextField(
+                        value = state.latitude,
+                        onValueChange = {
+                            viewModel.onEvent(
+                                AddPlaceScreenEvent.LatitudeUpdate(it)
+                            )
+                        },
 
-                    onValueChange = {
-                        viewModel.onEvent(
-                            AddPlaceScreenEvent.PlaceNameUpdate(it)
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                    isError = state.titleError != null,
-                    transitionState = state.transitionState,
-                    onClickTrailingIcon = {
-                        viewModel.onEvent(
-                            AddPlaceScreenEvent.PlaceNameUpdate("")
-                        )
-                    },
-                    onError = {
-                        Text(text = "title cannot be blank")
-                    },
-                    placeHolder = {
-                        Text(
-                            text = "location..",
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                )
-                HeightSpacer(dp = 8.dp)
-                AddPlaceOutlinedTextField(
-                    value = state.latitude,
-                    onValueChange = {
-                        viewModel.onEvent(
-                            AddPlaceScreenEvent.LatitudeUpdate(it)
-                        )
-                    },
-
-                    isError = state.latitudeError != null,
-                    transitionState = state.transitionState,
-                    onClickTrailingIcon = {
-                        viewModel.onEvent(
-                            AddPlaceScreenEvent.LatitudeUpdate("")
-                        )
-                    },
-                    onError = {
-                        Text(text = "latitude must be digit-like")
-                    },
-                    placeHolder = {
-                        Text(
-                            text = "location latitude..",
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                )
-                HeightSpacer(dp = 8.dp)
-                AddPlaceOutlinedTextField(
-                    value = state.longitude,
-                    onValueChange = {
-                        viewModel.onEvent(
-                            AddPlaceScreenEvent.LongitudeUpdate(it)
-                        )
-                    },
-                    isError = state.longitudeError != null,
-                    transitionState = state.transitionState,
-                    onClickTrailingIcon = {
-                        viewModel.onEvent(
-                            AddPlaceScreenEvent.LongitudeUpdate("")
-                        )
-                    },
-                    onError = {
-                        Text(text = "longitude must be digit-like")
-                    },
-                    placeHolder = {
-                        Text(
-                            text = "location longitude..",
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                )
-                HeightSpacer(dp = 72.dp)
-                ElevatedButton(
-                    modifier = Modifier
-                        .height(72.dp)
-                        .fillMaxWidth(0.8f),
-                    onClick = { viewModel.onEvent(AddPlaceScreenEvent.AddPlaceApply) },
-                    enabled = state.transitionState == TransitionState.Content,
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    LoadingLeadingIcon(state = state.transitionState)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Apply")
+                        isError = state.latitudeError != null,
+                        transitionState = state.transitionState,
+                        onClickTrailingIcon = {
+                            viewModel.onEvent(
+                                AddPlaceScreenEvent.LatitudeUpdate("")
+                            )
+                        },
+                        onError = {
+                            Text(text = "latitude must be digit-like")
+                        },
+                        placeHolder = {
+                            Text(
+                                text = "location latitude..",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    )
+                    HeightSpacer(dp = 8.dp)
+                    AddPlaceOutlinedTextField(
+                        value = state.longitude,
+                        onValueChange = {
+                            viewModel.onEvent(
+                                AddPlaceScreenEvent.LongitudeUpdate(it)
+                            )
+                        },
+                        isError = state.longitudeError != null,
+                        transitionState = state.transitionState,
+                        onClickTrailingIcon = {
+                            viewModel.onEvent(
+                                AddPlaceScreenEvent.LongitudeUpdate("")
+                            )
+                        },
+                        onError = {
+                            Text(text = "longitude must be digit-like")
+                        },
+                        placeHolder = {
+                            Text(
+                                text = "location longitude..",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    )
+                    HeightSpacer(dp = 72.dp)
+                    PrimaryButton(
+                        onClick = { viewModel.onEvent(AddPlaceScreenEvent.AddPlaceApply) },
+                        enabled = state.transitionState == TransitionState.Content,
+                        leadingIcon = {
+                            LoadingLeadingIcon(
+                                state = state.transitionState
+                            )
+                        },
+                        title = "Add new location"
+                    )
+                    HeightSpacer(dp = 16.dp)
                 }
             }
         }
@@ -221,6 +229,7 @@ private fun Screen(viewModel: AddPlaceViewModel) {
 fun HeightSpacer(dp: Dp) {
     Spacer(modifier = Modifier.height(dp))
 }
+
 @Suppress("LongParameterList")
 @Composable
 private fun AddPlaceOutlinedTextField(
@@ -277,6 +286,7 @@ private fun DismissIcon(
     IconButton(onClick = onClick) {
         Icon(
             painter = rememberVectorPainter(image = Icons.Default.Clear),
-            contentDescription = "clear")
+            contentDescription = "clear"
+        )
     }
 }
