@@ -71,7 +71,7 @@ class AddPlaceViewModel(
                     if (_state.value.isNotError) {
                         try {
                             val weather =
-                                repository.getWeather(
+                                repository.fetchWeather(
                                     latitude = getFloatFromString(_state.value.latitude),
                                     longitude = getFloatFromString(_state.value.longitude)
                                 )
