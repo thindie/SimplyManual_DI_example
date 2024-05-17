@@ -21,6 +21,11 @@ class DetailPlaceViewModel(
                     routeFlow.emit(AppRouter.RouteEvent.AllPlaces)
                 }
             }
+            is DetailPlaceScreenEvent.ChangePlaceTitle -> TODO()
+            DetailPlaceScreenEvent.DeletePlace -> TODO()
+            is DetailPlaceScreenEvent.RequestHourlyForecast -> {
+
+            }
         }
     }
 }

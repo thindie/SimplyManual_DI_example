@@ -1,8 +1,5 @@
 package com.thindie.simplyweather.presentation.detail_place.screen
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,10 +41,4 @@ fun NavGraphBuilder.detailPlaceScreen() {
 private fun Screen(viewModel: DetailPlaceViewModel) {
     OnBackPressedHandler(onBack = { viewModel.onEvent(DetailPlaceScreenEvent.OnBackClick) })
 
-    Box {
-
-        Button(onClick = { viewModel.onEvent(DetailPlaceScreenEvent.OnBackClick) }) {
-            Text(text = "DetailScreen")
-        }
-    }
 }
