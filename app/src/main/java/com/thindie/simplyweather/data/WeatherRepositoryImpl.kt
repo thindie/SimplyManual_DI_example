@@ -22,8 +22,8 @@ class WeatherRepositoryImpl(private val apiService: ApiService) : WeatherReposit
        return cacheDaily
             .map { list ->
                 list.filter {
-                    it.latitude.toString().take(5) == latitude
-                            && it.longitude.toString().take(5) == longitude
+                    it.latitude.toString() == latitude
+                            && it.longitude.toString() == longitude
                 }
             }
     }
@@ -66,5 +66,11 @@ class WeatherRepositoryImpl(private val apiService: ApiService) : WeatherReposit
                 }
             }
             .filterNotNull()
+    }
+
+    override suspend fun deleteWeather(latitude: String, longitude: String) {
+
+    }
+    override suspend fun updateWeather(title: String, latitude: String, longitude: String) {
     }
 }

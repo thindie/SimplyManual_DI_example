@@ -62,8 +62,8 @@ class AllPlacesViewModel(
                 viewModelScope.launch {
                     routeFlow.emit(
                         AppRouter.RouteEvent.DetailPlace(
-                            latitude = event.forecast.latitude.toString(),
-                            longitude = event.forecast.longitude.toString()
+                            latitude = event.weather.latitude.toString(),
+                            longitude = event.weather.longitude.toString()
                         )
                     )
                 }

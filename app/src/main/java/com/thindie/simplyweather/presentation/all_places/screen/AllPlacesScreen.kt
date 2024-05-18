@@ -122,7 +122,12 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                             CurrentWeather(
                                 currentWeather = it,
                                 onClick = {
-
+                                    viewModel
+                                        .onEvent(
+                                            AllPlacesScreenEvent.RequestPlaceDetails(
+                                                 it
+                                            )
+                                        )
                                 }
                             )
                         }

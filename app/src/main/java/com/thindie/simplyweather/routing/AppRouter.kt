@@ -39,7 +39,9 @@ fun NavHostController.onRouteEvent(routeEvent: AppRouter.RouteEvent) {
         is AppRouter.RouteEvent.DetailPlace -> {
             val latitude = routeEvent.latitude
             val longitude = routeEvent.longitude
-            forward(AppRouter.RouteEvent.DetailPlace::class.java.name.plus("/{$latitude###$longitude}"))
+            forward(AppRouter.RouteEvent.DetailPlace::class.java.name
+                .plus("/{coordinates-${latitude}_$longitude}")
+            )
         }
     }
 }
