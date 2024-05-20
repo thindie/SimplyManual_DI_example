@@ -23,5 +23,5 @@ data class CurrentResponse(
     @SerialName("timezone_abbreviation")
     val timezoneAbbreviation: String,
     @SerialName("utc_offset_seconds")
-    val utcOffsetSeconds: Int
+    val utcOffsetSeconds: Int,
 )

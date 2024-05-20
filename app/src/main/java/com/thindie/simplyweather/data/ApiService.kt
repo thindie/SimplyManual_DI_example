@@ -1,5 +1,7 @@
 @file:Suppress("LongParameterList")
+
 package com.thindie.simplyweather.data
+
 import com.thindie.simplyweather.data.dto.currentdto.CurrentResponse
 import com.thindie.simplyweather.data.dto.dailydto.WeatherDailyResponse
 import com.thindie.simplyweather.data.dto.hourlydto.WeatherHourlyResponse
@@ -39,6 +41,7 @@ interface ApiService {
         @Query(PARAM_TIMEZONE, encoded = true) timeZone: String,
         @Query(CURRENT_WEATHER) boolean: Boolean = true,
     ): WeatherHourlyResponse
+
     @GET("/v1/forecast")
     suspend fun getCurrentWeather(
         @Query(PARAM_LATITUDE) latitude: Float,
@@ -70,4 +73,5 @@ private const val HOURLY_NETWORK_QUERY =
             "rain,showers,snowfall,weathercode,visibility,windspeed_10m" +
             ",windgusts_10m"
 
-private const val CURRENT_NETWORK_QUERY = "relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,snowfall,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
+private const val CURRENT_NETWORK_QUERY =
+    "relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,snowfall,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m"

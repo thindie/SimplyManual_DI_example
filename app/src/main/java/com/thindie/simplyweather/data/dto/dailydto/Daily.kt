@@ -1,6 +1,7 @@
 package com.thindie.simplyweather.data.dto.dailydto
 
 import kotlinx.serialization.Serializable
+
 @Suppress("ConstructorParameterNaming")
 @Serializable
 data class Daily(

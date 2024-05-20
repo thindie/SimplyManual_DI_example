@@ -9,7 +9,7 @@ class WeatherApplication : Application(), DependenciesProvider.DependenciesHolde
 
     override fun setDependenciesProvider(dependenciesProvider: DependenciesProvider) {
         if (!::dependenciesProvider.isInitialized) {
-           this.dependenciesProvider = dependenciesProvider
+            this.dependenciesProvider = dependenciesProvider
         } else {
             /*ignore*/
         }

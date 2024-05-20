@@ -31,7 +31,7 @@ class DependenciesProvider private constructor() {
         fun getDependenciesProvider(): DependenciesProvider
     }
 
-    private lateinit var router : AppRouter
+    private lateinit var router: AppRouter
 
     init {
         AppRouter.inject(this)
@@ -102,13 +102,16 @@ class DependenciesProvider private constructor() {
         }
     }
 
-    fun getDetailScreenViewModelFactory(latitude: String, longitude: String) : ViewModelProvider.Factory {
+    fun getDetailScreenViewModelFactory(
+        latitude: String,
+        longitude: String,
+    ): ViewModelProvider.Factory {
         this.latitude = latitude
         this.longitude = longitude
         return detailPlaceViewModelFactory
     }
 
-    fun inject(activity: MainActivity){
+    fun inject(activity: MainActivity) {
         activity.appRouter = router
     }
 

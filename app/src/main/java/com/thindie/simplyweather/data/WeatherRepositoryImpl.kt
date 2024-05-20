@@ -19,7 +19,7 @@ class WeatherRepositoryImpl(private val apiService: ApiService) : WeatherReposit
     }
 
     override fun observeWeather(latitude: String, longitude: String): Flow<List<DailyForecast>> {
-       return cacheDaily
+        return cacheDaily
             .map { list ->
                 list.filter {
                     it.latitude.toString() == latitude
@@ -71,6 +71,7 @@ class WeatherRepositoryImpl(private val apiService: ApiService) : WeatherReposit
     override suspend fun deleteWeather(latitude: String, longitude: String) {
 
     }
+
     override suspend fun updateWeather(title: String, latitude: String, longitude: String) {
     }
 }

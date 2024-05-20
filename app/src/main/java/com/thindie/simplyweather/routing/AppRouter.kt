@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import com.thindie.simplyweather.di.DependenciesProvider
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-class AppRouter private constructor(){
+class AppRouter private constructor() {
     private val _routeEvent: MutableSharedFlow<RouteEvent> = MutableSharedFlow()
     val routeFlow
         get() = _routeEvent
@@ -17,8 +17,9 @@ class AppRouter private constructor(){
         data object AllPlaces : RouteEvent()
         data object AddPlace : RouteEvent()
     }
+
     companion object {
-        fun inject(dependenciesProvider: DependenciesProvider){
+        fun inject(dependenciesProvider: DependenciesProvider) {
             dependenciesProvider.setAppRouter(AppRouter())
         }
     }
@@ -39,8 +40,9 @@ fun NavHostController.onRouteEvent(routeEvent: AppRouter.RouteEvent) {
         is AppRouter.RouteEvent.DetailPlace -> {
             val latitude = routeEvent.latitude
             val longitude = routeEvent.longitude
-            forward(AppRouter.RouteEvent.DetailPlace::class.java.name
-                .plus("/{coordinates-${latitude}_$longitude}")
+            forward(
+                AppRouter.RouteEvent.DetailPlace::class.java.name
+                    .plus("/{coordinates-${latitude}_$longitude}")
             )
         }
     }

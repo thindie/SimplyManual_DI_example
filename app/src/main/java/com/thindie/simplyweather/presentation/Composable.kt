@@ -25,7 +25,7 @@ fun PrimaryButton(
 ) {
     ElevatedButton(
         modifier = modifier
-            .height(72.dp)
+            .height(54.dp)
             .fillMaxWidth(0.8f),
         onClick = onClick,
         enabled = enabled,
@@ -35,8 +35,8 @@ fun PrimaryButton(
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = title,
-            fontWeight = FontWeight.Black,
-            style = MaterialTheme.typography.bodyLarge
+            fontWeight = FontWeight.Thin,
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }
@@ -52,7 +52,7 @@ fun MVIScaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             if (shouldShowTopBar) {
-                    topBar()
+                topBar()
             } else {
                 topBarPlaceHolder()
             }

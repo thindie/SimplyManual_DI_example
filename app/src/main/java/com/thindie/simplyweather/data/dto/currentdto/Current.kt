@@ -30,5 +30,5 @@ data class Current(
     @SerialName("wind_gusts_10m")
     val windGusts10m: Double,
     @SerialName("wind_speed_10m")
-    val windSpeed10m: Double
+    val windSpeed10m: Double,
 )

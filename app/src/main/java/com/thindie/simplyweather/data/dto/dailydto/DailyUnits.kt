@@ -1,6 +1,7 @@
 package com.thindie.simplyweather.data.dto.dailydto
 
 import kotlinx.serialization.Serializable
+
 @Suppress("ConstructorParameterNaming")
 @Serializable
 data class DailyUnits(
@@ -14,5 +15,5 @@ data class DailyUnits(
     val uv_index_max: String,
     val winddirection_10m_dominant: String,
     val windgusts_10m_max: String,
-    val windspeed_10m_max: String
+    val windspeed_10m_max: String,
 )

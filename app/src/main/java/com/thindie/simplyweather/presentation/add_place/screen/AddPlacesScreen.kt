@@ -2,6 +2,7 @@ package com.thindie.simplyweather.presentation.add_place.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,20 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,7 +39,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.thindie.simplyweather.di.DependenciesProvider
-import com.thindie.simplyweather.presentation.MVIScaffold
 import com.thindie.simplyweather.presentation.PrimaryButton
 import com.thindie.simplyweather.presentation.TransitionState
 import com.thindie.simplyweather.presentation.add_place.event.AddPlaceScreenEvent
@@ -75,64 +72,64 @@ private fun Screen(viewModel: AddPlaceViewModel) {
             initialValue = AddPlaceState(),
             minActiveState = Lifecycle.State.RESUMED
         )
-    MVIScaffold(
-        topBar = {
-            IconButton(onClick = { viewModel.onEvent(AddPlaceScreenEvent.OnClickBack) }) {
-                Icon(
-                    painter = rememberVectorPainter(image = Icons.Default.ArrowBack),
-                    contentDescription = "back click"
-                )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+            .navigationBarsPadding()
+            .padding(bottom = 24.dp)
+    )
+    {
+        when (state.transitionState) {
+            TransitionState.None -> {
+                AddPlaceShimmer()
             }
-        },
-        topBarPlaceHolder = {
-            CircularProgressIndicator(
-                modifier = Modifier.size(24.dp),
-                strokeWidth = 1.5.dp
-            )
-        },
-        shouldShowTopBar = state.transitionState == TransitionState.Content
-    ) {
-        Column(
-            modifier = it
-                .verticalScroll(state = rememberScrollState())
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .imePadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            when (state.transitionState) {
-                TransitionState.None -> {
-                    CircularProgressIndicator(strokeWidth = 1.5.dp)
+
+            else -> {
+                PrimaryButton(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    onClick = { viewModel.onEvent(AddPlaceScreenEvent.AddPlaceApply) },
+                    enabled = state.transitionState == TransitionState.Content,
+                    leadingIcon = {
+                        LoadingLeadingIcon(
+                            state = state.transitionState
+                        )
+                    },
+                    title = "Принять"
+                )
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxWidth(0.9f)
+                        .height(64.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        modifier = Modifier.align(Alignment.Start),
+                        text = "Добавить место",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Thin
+                    )
+                    HeightSpacer(dp = 24.dp)
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                    )
                 }
 
-                else -> {
-                    HeightSpacer(dp = 16.dp)
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .height(64.dp),
-                        shadowElevation = 8.dp,
-                        tonalElevation = 8.dp,
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "Add new location",
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.Black
-                            )
-                        }
-                    }
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     HeightSpacer(dp = 48.dp)
                     AddPlaceOutlinedTextField(
                         value = state.placeTitle,
-
                         onValueChange = {
                             viewModel.onEvent(
                                 AddPlaceScreenEvent.PlaceNameUpdate(it)
@@ -207,23 +204,12 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                             )
                         }
                     )
-                    HeightSpacer(dp = 72.dp)
-                    PrimaryButton(
-                        onClick = { viewModel.onEvent(AddPlaceScreenEvent.AddPlaceApply) },
-                        enabled = state.transitionState == TransitionState.Content,
-                        leadingIcon = {
-                            LoadingLeadingIcon(
-                                state = state.transitionState
-                            )
-                        },
-                        title = "Add new location"
-                    )
-                    HeightSpacer(dp = 16.dp)
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun HeightSpacer(dp: Dp) {

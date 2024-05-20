@@ -15,5 +15,5 @@ data class Hourly(
     val visibility: List<Double>,
     val weathercode: List<Int>,
     val windgusts_10m: List<Double>,
-    val windspeed_10m: List<Double>
+    val windspeed_10m: List<Double>,
 )

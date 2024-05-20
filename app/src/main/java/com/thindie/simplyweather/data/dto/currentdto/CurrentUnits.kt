@@ -30,5 +30,5 @@ data class CurrentUnits(
     @SerialName("wind_gusts_10m")
     val windGusts10m: String,
     @SerialName("wind_speed_10m")
-    val windSpeed10m: String
+    val windSpeed10m: String,
 )

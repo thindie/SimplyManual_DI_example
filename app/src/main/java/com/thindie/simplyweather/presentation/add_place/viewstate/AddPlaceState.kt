@@ -10,7 +10,7 @@ data class AddPlaceState(
     val isAddDialogResumed: Boolean = false,
     val placeTitle: String = "",
     val latitude: String = "",
-    val longitude: String = ""
+    val longitude: String = "",
 ) {
     val isNotError = titleError == null && latitudeError == null && longitudeError == null
 }
