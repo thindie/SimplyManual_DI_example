@@ -49,11 +49,10 @@ fun CurrentWeather(
             Spacer(modifier = Modifier.width(12.dp))
             TextButton(
                 onClick = onClick,
-                contentPadding = PaddingValues(0.dp)
+                contentPadding = PaddingValues(2.dp)
             ) {
                 Text(
                     text = currentWeatherTitle,
-                    modifier = Modifier,
                     maxLines = 1,
                     fontWeight = FontWeight.Bold,
                     overflow = TextOverflow.Ellipsis,
@@ -70,16 +69,16 @@ fun CurrentWeather(
             Text(
                 text = format("ветер: %s м/с", currentWeather.windSpeed10m.toString()),
                 modifier = Modifier,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Light,
                 color = LocalTextStyle.current.color.copy(0.5f),
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelLarge,
             )
             Text(
                 text = format("осадки %s мм", currentWeather.precipitation.toString()),
                 modifier = Modifier,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.Light,
                 color = LocalTextStyle.current.color.copy(0.5f),
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelLarge,
             )
         }
     }

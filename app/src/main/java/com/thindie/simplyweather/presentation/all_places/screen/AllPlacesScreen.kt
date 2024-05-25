@@ -109,7 +109,8 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                         Divider(
                             modifier = Modifier
                                 .padding(horizontal = 24.dp)
-                                .fillMaxWidth()
+                                .fillMaxWidth(),
+                            color = Color.Black
                         )
                     }
                     item {
