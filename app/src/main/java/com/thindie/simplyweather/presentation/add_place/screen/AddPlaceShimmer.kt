@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -68,6 +69,44 @@ fun AddPlaceShimmer() {
                 .shimmerEffect(MaterialTheme.shapes.large)
         )
 
+    }
+}
+
+@Composable
+fun AddPlaceShimmerPlaceSelection() {
+    Column(
+        modifier = Modifier.padding(horizontal = 24.dp)
+    ) {
+        HeightSpacer(dp = 12.dp)
+        Spacer(
+            modifier = Modifier
+                .height(24.dp)
+                .width(160.dp)
+                .shimmerEffect(MaterialTheme.shapes.medium)
+        )
+        HeightSpacer(dp = 16.dp)
+        Spacer(
+            modifier = Modifier
+                .height(16.dp)
+                .width(60.dp)
+                .shimmerEffect(MaterialTheme.shapes.extraLarge)
+        )
+        HeightSpacer(dp = 16.dp)
+        Spacer(
+            modifier = Modifier
+                .height(12.dp)
+                .width(60.dp)
+                .shimmerEffect(MaterialTheme.shapes.extraLarge)
+        )
+        HeightSpacer(dp = 32.dp)
+    }
+}
+
+@Preview
+@Composable
+private fun PlaceSelectionPreview() {
+    SimplyWeatherTheme {
+        AddPlaceShimmerPlaceSelection()
     }
 }
 

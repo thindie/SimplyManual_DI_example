@@ -16,6 +16,7 @@ class AppRouter private constructor() {
         data class DetailPlace(val latitude: String, val longitude: String) : RouteEvent()
         data object AllPlaces : RouteEvent()
         data object AddPlace : RouteEvent()
+        data class RenamePlace(val latitude: String, val longitude: String) : RouteEvent()
     }
 
     companion object {
@@ -43,6 +44,15 @@ fun NavHostController.onRouteEvent(routeEvent: AppRouter.RouteEvent) {
             forward(
                 AppRouter.RouteEvent.DetailPlace::class.java.name
                     .plus("/{coordinates-${latitude}_$longitude}")
+            )
+        }
+        is AppRouter.RouteEvent.RenamePlace -> {
+            val latitude = routeEvent.latitude
+            val longitude = routeEvent.longitude
+            forward(
+                AppRouter.RouteEvent.RenamePlace::class.java.name.plus(
+                    "/{coordinates-${latitude}_$longitude}"
+                )
             )
         }
     }

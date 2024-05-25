@@ -7,6 +7,7 @@ import com.thindie.simplyweather.presentation.TransitionState
 import com.thindie.simplyweather.presentation.add_place.event.AddPlaceScreenEvent
 import com.thindie.simplyweather.presentation.add_place.viewstate.AddPlaceError
 import com.thindie.simplyweather.presentation.add_place.viewstate.AddPlaceState
+import com.thindie.simplyweather.presentation.add_place.viewstate.AddPlaceSuccess
 import com.thindie.simplyweather.routing.AppRouter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -68,17 +69,25 @@ class AddPlaceViewModel(
                     validateTitle()
                     validateLatitude()
                     validateLongitude()
-                    if (_state.value.isNotError) {
+                    if (_state.value.isInputFieldsIsNotError) {
                         try {
-                            val weather =
-                                repository.fetchWeather(
-                                    latitude = getFloatFromString(_state.value.latitude),
-                                    longitude = getFloatFromString(_state.value.longitude)
+                            repository.fetchWeather(
+                                latitude = getFloatFromString(_state.value.latitude),
+                                longitude = getFloatFromString(_state.value.longitude),
+                            )
+                            _state.update {
+                                it.copy(
+                                    transitionState = TransitionState.Content,
+                                    addPlaceSuccess = AddPlaceSuccess.SuccessAddition,
+                                    addPlaceError = null
                                 )
+                            }
                         } catch (_: Exception) {
                             _state.update {
                                 it.copy(
-                                    transitionState = TransitionState.Error
+                                    transitionState = TransitionState.Error,
+                                    addPlaceError = AddPlaceError.RequestAddPlaceUnSuccess,
+                                    addPlaceSuccess = null
                                 )
                             }
                         }
@@ -100,6 +109,69 @@ class AddPlaceViewModel(
                             transitionState = TransitionState.Content
                         )
                     }
+                }
+            }
+
+            is AddPlaceScreenEvent.RequestPlaceDetection -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            detectionPlaceTransitionState = TransitionState.Loading
+                        )
+                    }
+                    val placeDetection = repository.getWeatherPlacePossibilities(event.placeTitle)
+                    _state.update {
+                        it.copy(
+                            detectionPlaceTransitionState = if (placeDetection.isEmpty()) {
+                                TransitionState.Error
+                            } else {
+                                TransitionState.Content
+                            },
+                            weatherPlacePossibility = placeDetection,
+                            addPlaceError = if (placeDetection.isEmpty()) {
+                                AddPlaceError.EmptyAutoFind
+                            } else null
+                        )
+                    }
+                }
+            }
+
+            is AddPlaceScreenEvent.ApplyPlaceDetection -> {
+                _state.update {
+                    it.copy(
+                        detectionPlaceTransitionState = TransitionState.None,
+                        placeTitle = event.possibility.name,
+                        latitude = event.possibility.latitude,
+                        longitude = event.possibility.longitude,
+                        titleError = null,
+                        latitudeError = null,
+                        longitudeError = null
+                    )
+                }
+            }
+
+            AddPlaceScreenEvent.DismissPlaceDetection -> {
+                _state.update {
+                    it.copy(
+                        detectionPlaceTransitionState = TransitionState.None,
+                    )
+                }
+            }
+
+            AddPlaceScreenEvent.DismissSnack -> {
+                _state.update {
+                    it.copy(
+                        addPlaceSuccess = null,
+                        addPlaceError = null
+                    )
+                }
+            }
+
+            AddPlaceScreenEvent.RequestAllPlacesScreen -> {
+                viewModelScope.launch {
+                    routeFlow.emit(
+                        AppRouter.RouteEvent.AllPlaces
+                    )
                 }
             }
         }

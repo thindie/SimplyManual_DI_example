@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.thindie.simplyweather.MainActivity
 import com.thindie.simplyweather.data.ApiService
+import com.thindie.simplyweather.data.PlaceDetectionApiService
 import com.thindie.simplyweather.data.WeatherRepositoryImpl
 import com.thindie.simplyweather.domain.WeatherRepository
 import com.thindie.simplyweather.presentation.add_place.viewmodel.AddPlaceViewModel
 import com.thindie.simplyweather.presentation.all_places.viewmodel.AllPlacesViewModel
 import com.thindie.simplyweather.presentation.detail_place.viewmodel.DetailPlaceViewModel
+import com.thindie.simplyweather.presentation.rename_place.viewmodel.RenamePlaceViewModel
 import com.thindie.simplyweather.routing.AppRouter
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -57,9 +59,24 @@ class DependenciesProvider private constructor() {
         .baseUrl(BASE_URL)
         .build()
 
-    private val apiService: ApiService = retrofit.create(ApiService::class.java)
+    private val placeDetectionRetrofit =
+        Retrofit
+            .Builder()
+            .addConverterFactory(
+                json
+                    .asConverterFactory(
+                        "application/json; charset=UTF8"
+                            .toMediaType()
+                    )
+            )
+            .baseUrl("https://nominatim.openstreetmap.org")
+            .build()
 
-    private val repository: WeatherRepository = WeatherRepositoryImpl(apiService)
+    private val apiService: ApiService = retrofit.create(ApiService::class.java)
+    private val placeDetection: PlaceDetectionApiService =
+        placeDetectionRetrofit.create(PlaceDetectionApiService::class.java)
+
+    private val repository: WeatherRepository = WeatherRepositoryImpl(apiService, placeDetection)
 
     val allPlacesViewModelFactory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -102,6 +119,7 @@ class DependenciesProvider private constructor() {
         }
     }
 
+
     fun getDetailScreenViewModelFactory(
         latitude: String,
         longitude: String,
@@ -109,6 +127,31 @@ class DependenciesProvider private constructor() {
         this.latitude = latitude
         this.longitude = longitude
         return detailPlaceViewModelFactory
+    }
+
+    private lateinit var renameViewModelLatitude: String
+    private lateinit var renameViewModelLongitude: String
+
+    private val renamePlaceViewModelFactory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(
+            modelClass: Class<T>,
+        ): T {
+            return RenamePlaceViewModel(
+                repository = repository,
+                routeFlow = router.routeFlow,
+                latitude = renameViewModelLatitude,
+                longitude = renameViewModelLongitude
+            ) as T
+        }
+    }
+    fun getRenameScreenViewModelFactory(
+        latitude: String,
+        longitude: String,
+    ): ViewModelProvider.Factory {
+        this.renameViewModelLatitude = latitude
+        this.renameViewModelLongitude = longitude
+        return renamePlaceViewModelFactory
     }
 
     fun inject(activity: MainActivity) {
