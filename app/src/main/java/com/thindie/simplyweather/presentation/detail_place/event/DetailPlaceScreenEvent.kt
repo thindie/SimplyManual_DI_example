@@ -12,5 +12,6 @@ sealed class DetailPlaceScreenEvent {
     data object RequestDetailForecast : DetailPlaceScreenEvent()
     data object TriggerDropDownMenu : DetailPlaceScreenEvent()
     data object TriggerChangeTitle : DetailPlaceScreenEvent()
+    data object DismissHourlyForecast: DetailPlaceScreenEvent()
 
 }

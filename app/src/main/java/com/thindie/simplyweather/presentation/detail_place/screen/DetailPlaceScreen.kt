@@ -1,5 +1,6 @@
 package com.thindie.simplyweather.presentation.detail_place.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,19 +17,27 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +50,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.thindie.simplyweather.di.DependenciesProvider
 import com.thindie.simplyweather.domain.DailyForecast
+import com.thindie.simplyweather.domain.HourlyForecast
 import com.thindie.simplyweather.presentation.TransitionState
 import com.thindie.simplyweather.presentation.add_place.screen.HeightSpacer
 import com.thindie.simplyweather.presentation.detail_place.event.DetailPlaceScreenEvent
@@ -65,14 +75,14 @@ fun NavGraphBuilder.detailPlaceScreen() {
             (LocalContext.current as DependenciesProvider.DependenciesHolder).getDependenciesProvider()
         val viewModel: DetailPlaceViewModel = viewModel(
             factory = dependenciesProvider.getDetailScreenViewModelFactory(
-                latitude.orEmpty(),
-                longitude.orEmpty()
+                latitude.orEmpty(), longitude.orEmpty()
             )
         )
         Screen(viewModel)
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Screen(viewModel: DetailPlaceViewModel) {
     OnBackPressedHandler(onBack = { viewModel.onEvent(DetailPlaceScreenEvent.OnBackClick) })
@@ -80,8 +90,7 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
         viewModel.onEvent(DetailPlaceScreenEvent.RequestDetailForecast)
     }
     val state by viewModel.state.collectAsStateWithLifecycle(
-        initialValue = DetailScreenState(),
-        minActiveState = Lifecycle.State.RESUMED
+        initialValue = DetailScreenState(), minActiveState = Lifecycle.State.RESUMED
     )
     Box(modifier = Modifier.fillMaxSize()) {
         when (state.transitionState) {
@@ -102,24 +111,22 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                                     text = state.weeklyForecast[0].apparentTempMax.toString(),
                                     modifier = Modifier,
                                     fontWeight = FontWeight.Black,
-                                    style = MaterialTheme.typography.headlineLarge
-                                        .copy(
-                                            color = LocalTextStyle.current.color.copy(
-                                                alpha = 0.6f
-                                            )
-                                        ),
+                                    style = MaterialTheme.typography.headlineLarge.copy(
+                                        color = LocalTextStyle.current.color.copy(
+                                            alpha = 0.6f
+                                        )
+                                    ),
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
                                 Text(
                                     text = state.weeklyForecast[0].apparentTempMin.toString(),
                                     modifier = Modifier,
                                     fontWeight = FontWeight.Light,
-                                    style = MaterialTheme.typography.headlineLarge
-                                        .copy(
-                                            color = LocalTextStyle.current.color.copy(
-                                                alpha = 0.5f
-                                            )
-                                        ),
+                                    style = MaterialTheme.typography.headlineLarge.copy(
+                                        color = LocalTextStyle.current.color.copy(
+                                            alpha = 0.5f
+                                        )
+                                    ),
                                     fontSize = 24.sp
                                 )
                             }
@@ -152,19 +159,18 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                                     state.weeklyForecast[0].windSpeed10mMax.toString()
                                 ),
                                 modifier = Modifier,
-                                fontWeight = FontWeight.Medium,
-                                color = LocalTextStyle.current.color.copy(0.3f),
-                                style = MaterialTheme.typography.labelMedium
+                                fontWeight = FontWeight.Light,
+                                color = LocalTextStyle.current.color.copy(0.5f),
+                                style = MaterialTheme.typography.labelLarge,
                             )
                             Text(
                                 text = format(
                                     "осадки %s мм",
                                     state.weeklyForecast[0].precipitationSum.toString()
                                 ),
-                                modifier = Modifier,
-                                fontWeight = FontWeight.Medium,
-                                color = LocalTextStyle.current.color.copy(0.3f),
-                                style = MaterialTheme.typography.labelMedium
+                                fontWeight = FontWeight.Light,
+                                color = LocalTextStyle.current.color.copy(0.5f),
+                                style = MaterialTheme.typography.labelLarge,
                             )
                         }
                     }
@@ -182,13 +188,19 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         items(state.weeklyForecast, key = DailyForecast::hashCode) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(72.dp),
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(MaterialTheme.shapes.medium)
+                                .clickable {
+                                    viewModel.onEvent(
+                                        DetailPlaceScreenEvent.RequestHourlyForecast(
+                                            it
+                                        )
+                                    )
+                                }
+                                .height(72.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
+                                horizontalArrangement = Arrangement.SpaceEvenly) {
                                 val temporalAccessor = getTemporalAccessor(it.sunrise)
                                 // date
                                 Row(
@@ -256,8 +268,7 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Divider(
-                                modifier = Modifier.fillMaxWidth(),
-                                thickness = Dp.Hairline
+                                modifier = Modifier.fillMaxWidth(), thickness = Dp.Hairline
                             )
                         }
                         item {
@@ -268,8 +279,7 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                                     .padding(horizontal = 24.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                ClickableText(
-                                    text = AnnotatedString("Вернуться"),
+                                ClickableText(text = AnnotatedString("Вернуться"),
                                     modifier = Modifier,
 
                                     style = MaterialTheme.typography.bodyLarge.copy(
@@ -279,11 +289,9 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                                         viewModel.onEvent(
                                             DetailPlaceScreenEvent.OnBackClick
                                         )
-                                    }
-                                )
+                                    })
                                 Spacer(modifier = Modifier.width(24.dp))
-                                ClickableText(
-                                    text = AnnotatedString("Действия"),
+                                ClickableText(text = AnnotatedString("Действия"),
                                     modifier = Modifier,
                                     style = MaterialTheme.typography.bodyLarge.copy(
                                         fontWeight = FontWeight.Medium,
@@ -293,60 +301,179 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                                         viewModel.onEvent(
                                             DetailPlaceScreenEvent.TriggerDropDownMenu
                                         )
-                                    }
-                                )
-                                DropdownMenu(
-                                    expanded = state.isDropDownResumed,
+                                    })
+                                DropdownMenu(expanded = state.isDropDownResumed,
                                     onDismissRequest = {
                                         viewModel.onEvent(
-                                            DetailPlaceScreenEvent
-                                                .TriggerDropDownMenu
+                                            DetailPlaceScreenEvent.TriggerDropDownMenu
                                         )
-                                    }
-                                ) {
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text = "Переименовать",
-                                                modifier = Modifier,
-                                                style = MaterialTheme.typography.bodyLarge
-                                                    .copy(
-                                                        fontWeight = FontWeight.Medium,
-                                                        fontSize = 16.sp,
-                                                    ),
-                                            )
-                                        },
-                                        onClick = {
-                                            viewModel.onEvent(
-                                                DetailPlaceScreenEvent.TriggerChangeTitle
-                                            )
-                                        }
-                                    )
+                                    }) {
+                                    DropdownMenuItem(text = {
+                                        Text(
+                                            text = "Переименовать",
+                                            modifier = Modifier,
+                                            style = MaterialTheme.typography.bodyLarge.copy(
+                                                fontWeight = FontWeight.Medium,
+                                                fontSize = 16.sp,
+                                            ),
+                                        )
+                                    }, onClick = {
+                                        viewModel.onEvent(
+                                            DetailPlaceScreenEvent.TriggerChangeTitle
+                                        )
+                                    })
                                     Divider(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        thickness = Dp.Hairline
+                                        modifier = Modifier.fillMaxWidth(), thickness = Dp.Hairline
                                     )
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(
-                                                text =
-                                                "Удалить",
-                                                modifier = Modifier,
-                                                style = MaterialTheme.typography.bodySmall
-                                                    .copy(
-                                                        fontWeight = FontWeight.Light,
-                                                    ),
-                                            )
-                                        },
-                                        onClick = {
-                                            viewModel.onEvent(
-                                                DetailPlaceScreenEvent.DeletePlace
-                                            )
-                                        }
-                                    )
+                                    DropdownMenuItem(text = {
+                                        Text(
+                                            text = "Удалить",
+                                            modifier = Modifier,
+                                            style = MaterialTheme.typography.bodySmall.copy(
+                                                fontWeight = FontWeight.Light,
+                                            ),
+                                        )
+                                    }, onClick = {
+                                        viewModel.onEvent(
+                                            DetailPlaceScreenEvent.DeletePlace
+                                        )
+                                    })
                                 }
                             }
                             HeightSpacer(dp = 24.dp)
+                        }
+                    }
+                }
+                if (state.isHourlyWeatherRequested) {
+                    ModalBottomSheet(onDismissRequest = {
+                        viewModel.onEvent(DetailPlaceScreenEvent.DismissHourlyForecast)
+                    }
+                    ) {
+                        when (state.hourlyTransitionState) {
+                            TransitionState.Content -> {
+                                HeightSpacer(dp = 8.dp)
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp)
+                                        .align(Alignment.CenterHorizontally)
+                                    ,
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "часы",
+                                        fontWeight = FontWeight.Medium,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "температура*",
+                                            fontWeight = FontWeight.Thin,
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                        Text(
+                                            text = "(комфорт)",
+                                            fontWeight = FontWeight.Thin,
+                                            style = MaterialTheme.typography.labelSmall
+                                        )
+                                    }
+
+                                    Text(
+                                        text = "осадки",
+                                        fontWeight = FontWeight.Black,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Text(
+                                        text = "ветер",
+                                        fontWeight = FontWeight.Medium,
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                                HeightSpacer(dp = 12.dp)
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 24.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    items(state.hourlyList, key = HourlyForecast::hashCode) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(MaterialTheme.shapes.medium)
+                                                .height(72.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.SpaceEvenly
+                                        ) {
+                                            val temporalAccessor = getTemporalAccessor(it.time)
+                                            // date
+                                            Row(
+                                                verticalAlignment = Alignment.Bottom
+                                            ) {
+                                                Text(
+                                                    text = temporalAccessor.toUiString("HH"),
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    style = MaterialTheme.typography.titleLarge,
+                                                )
+                                                Text(
+                                                    text = temporalAccessor.toUiString(":mm"),
+                                                    fontWeight = FontWeight.Light,
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                )
+                                            }
+                                            // temperature
+                                            Text(
+                                                text = it.temperature2m.toString(),
+                                                fontWeight = FontWeight.Black,
+                                                style = MaterialTheme.typography.titleLarge,
+                                                color = if (it.temperature2m > 0.0) Color.Red else Color.Blue
+                                            )
+                                            //precipitation
+                                            Row(
+                                                verticalAlignment = Alignment.Bottom
+                                            ) {
+                                                Text(
+                                                    text = it.precipitation.toString(),
+                                                    fontWeight = FontWeight.Black,
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                                Text(
+                                                    text = "mm",
+                                                    fontWeight = FontWeight.Thin,
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                            }
+                                            // windspeed
+                                            Row(
+                                                verticalAlignment = Alignment.Bottom
+                                            ) {
+                                                Text(
+                                                    text = it.windSpeed10m.toString(),
+                                                    fontWeight = FontWeight.Black,
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                                Text(
+                                                    text = "m/s",
+                                                    fontWeight = FontWeight.Thin,
+                                                    style = MaterialTheme.typography.bodyLarge
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Divider(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            thickness = Dp.Hairline
+                                        )
+                                    }
+                                }
+                            }
+
+                            TransitionState.Error -> {}
+                            TransitionState.Loading -> DetailPlaceShimmer()
+                            TransitionState.None -> DetailPlaceShimmer()
                         }
                     }
                 }

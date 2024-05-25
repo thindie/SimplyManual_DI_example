@@ -1,6 +1,5 @@
 package com.thindie.simplyweather.presentation.detail_place.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.thindie.simplyweather.domain.WeatherRepository
@@ -54,14 +53,46 @@ class DetailPlaceViewModel(
             }
 
             is DetailPlaceScreenEvent.RequestHourlyForecast -> {
-                _state.update {
-                    it?.copy(
-                        isHourlyWeatherRequested = !it.isHourlyWeatherRequested
-                    )
-                        ?: DetailScreenState(
-                            isHourlyWeatherRequested = false
+                repository
+                    .observeHourlyWeather()
+                    .onStart {
+                        repository.fetchHourlyWeather(
+                            latitude = latitude,
+                            longitude = longitude,
+                            dailyForecast = event.dailyForecast
                         )
-                }
+                        _state.update {
+                            it?.copy(
+                                isHourlyWeatherRequested = true,
+                                hourlyTransitionState = TransitionState.Loading
+                            )
+                                ?: DetailScreenState(
+                                    isHourlyWeatherRequested = false,
+                                    hourlyTransitionState = TransitionState.Loading
+                                )
+                        }
+                    }
+                    .onEach { list ->
+                        _state.update {
+                            it?.copy(
+                                hourlyList = list,
+                                hourlyTransitionState = if (list.isEmpty()) {
+                                    TransitionState.Error
+                                } else {
+                                    TransitionState.Content
+                                }
+                            )
+                                ?: DetailScreenState(
+                                    hourlyList = list,
+                                    hourlyTransitionState = if (list.isEmpty()) {
+                                        TransitionState.Error
+                                    } else {
+                                        TransitionState.Content
+                                    }
+                                )
+                        }
+                    }
+                    .launchIn(viewModelScope)
             }
 
             DetailPlaceScreenEvent.RequestDetailForecast -> {
@@ -103,22 +134,31 @@ class DetailPlaceViewModel(
             }
 
             DetailPlaceScreenEvent.TriggerChangeTitle -> {
-                _state.update {
-                    it?.copy(
-                        isChangeTitleResumed = !it.isChangeTitleResumed
-                    )
-                        ?: DetailScreenState(
-                            isChangeTitleResumed = false
+                viewModelScope.launch {
+                    routeFlow.emit(
+                        AppRouter.RouteEvent.RenamePlace(
+                            latitude = latitude, longitude = longitude
                         )
+                    )
                 }
             }
 
             DetailPlaceScreenEvent.TriggerDropDownMenu -> {
-                Log.d("SERVICE_TAG", "triggered")
                 _state.update {
                     it?.copy(
                         isDropDownResumed = !it.isDropDownResumed
                     )
+                }
+            }
+
+            DetailPlaceScreenEvent.DismissHourlyForecast -> {
+                _state.update {
+                    it?.copy(
+                        isHourlyWeatherRequested = false
+                    )
+                        ?: DetailScreenState(
+                            isHourlyWeatherRequested = false
+                        )
                 }
             }
         }
