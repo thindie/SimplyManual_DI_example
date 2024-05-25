@@ -2,34 +2,37 @@ package com.thindie.simplyweather.data.mappers
 
 import com.thindie.simplyweather.data.dto.currentdto.Current
 import com.thindie.simplyweather.data.dto.dailydto.Daily
+import com.thindie.simplyweather.data.dto.hourlydto.Hourly
+import com.thindie.simplyweather.data.dto.placedetectiondto.PlacesDetectionDtoItem
 import com.thindie.simplyweather.domain.CurrentWeather
 import com.thindie.simplyweather.domain.DailyForecast
+import com.thindie.simplyweather.domain.HourlyForecast
+import com.thindie.simplyweather.domain.WeatherPlacePossibility
 import com.thindie.simplyweather.domain.WeeklyForecast
 
 fun Daily.toWeeklyForecast(
     latitude: Float,
     longitude: Float,
-) =
-    WeeklyForecast(
-        weatherCode = weathercode,
-        sunset = sunset,
-        sunrise = sunrise,
-        apparentTempMax = apparent_temperature_max,
-        apparentTempMin = apparent_temperature_min,
-        precipitationHours = precipitation_hours,
-        precipitationProbabilityMax = precipitation_probability_max,
-        precipitationSum = precipitation_sum,
-        rainSum = rain_sum,
-        showersSum = showers_sum,
-        snowfallSum = snowfall_sum,
-        time = time,
-        uvIndexMax = uv_index_max,
-        windDirection10mDominant = winddirection_10m_dominant,
-        windGusts10mMax = windgusts_10m_max,
-        windSpeed10mMax = windspeed_10m_max,
-        latitude = latitude,
-        longitude = longitude
-    )
+) = WeeklyForecast(
+    weatherCode = weathercode,
+    sunset = sunset,
+    sunrise = sunrise,
+    apparentTempMax = apparent_temperature_max,
+    apparentTempMin = apparent_temperature_min,
+    precipitationHours = precipitation_hours,
+    precipitationProbabilityMax = precipitation_probability_max,
+    precipitationSum = precipitation_sum,
+    rainSum = rain_sum,
+    showersSum = showers_sum,
+    snowfallSum = snowfall_sum,
+    time = time,
+    uvIndexMax = uv_index_max,
+    windDirection10mDominant = winddirection_10m_dominant,
+    windGusts10mMax = windgusts_10m_max,
+    windSpeed10mMax = windspeed_10m_max,
+    latitude = latitude,
+    longitude = longitude
+)
 
 fun WeeklyForecast.toDailyForecastList(): List<DailyForecast> {
     return buildList {
@@ -64,21 +67,50 @@ fun WeeklyForecast.toDailyForecastList(): List<DailyForecast> {
     }
 }
 
-fun Current.toCurrentWeather(latitude: Float, longitude: Float) =
-    CurrentWeather(
-        latitude = latitude,
-        longitude = longitude,
-        apparentTemperature = apparentTemperature,
-        interval = interval,
-        isDay = isDay == 1,
-        precipitation = precipitation,
-        rain = rain,
-        relativeHumidity2m = relativeHumidity2m,
-        snowfall = snowfall,
-        time = time,
-        weatherCode = weatherCode,
-        windDirection10m = windDirection10m,
-        windGusts10m = windGusts10m,
-        windSpeed10m = windSpeed10m
+fun Current.toCurrentWeather(latitude: Float, longitude: Float) = CurrentWeather(
+    latitude = latitude,
+    longitude = longitude,
+    apparentTemperature = apparentTemperature,
+    interval = interval,
+    isDay = isDay == 1,
+    precipitation = precipitation,
+    rain = rain,
+    relativeHumidity2m = relativeHumidity2m,
+    snowfall = snowfall,
+    time = time,
+    weatherCode = weatherCode,
+    windDirection10m = windDirection10m,
+    windGusts10m = windGusts10m,
+    windSpeed10m = windSpeed10m
+)
 
-    )
+fun Hourly.toHourlyForecastList(): List<HourlyForecast> {
+    return buildList {
+        repeat(apparent_temperature.size) {
+            try {
+                this.add(
+                    HourlyForecast(
+                        apparentTemperature = apparent_temperature[it],
+                        precipitation = precipitation[it],
+                        rain = rain[it],
+                        showers = showers[it],
+                        snowfall = snowfall[it],
+                        temperature2m = temperature_2m[it],
+                        time = time[it],
+                        visibility = visibility[it],
+                        weatherCode = weathercode[it],
+                        windGusts10m = windgusts_10m[it],
+                        windSpeed10m = windgusts_10m[it]
+                    )
+                )
+            } catch (_: Exception) {
+            }
+        }
+    }
+}
+fun PlacesDetectionDtoItem.toWeatherPlacePossibility() = WeatherPlacePossibility(
+    displayName = displayName,
+    latitude = latitude,
+    longitude = longitude,
+    name = name
+)

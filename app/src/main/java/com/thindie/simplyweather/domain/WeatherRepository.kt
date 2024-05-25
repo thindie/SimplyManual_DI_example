@@ -9,4 +9,14 @@ interface WeatherRepository {
     fun observeCurrentWeather(): Flow<List<CurrentWeather>>
     suspend fun deleteWeather(latitude: String, longitude: String)
     suspend fun updateWeather(title: String, latitude: String, longitude: String)
+
+    fun observePlaceTitle(latitude: String, longitude: String): Flow<String>
+    suspend fun fetchHourlyWeather(
+        latitude: String,
+        longitude: String,
+        dailyForecast: DailyForecast,
+    )
+
+    suspend fun getWeatherPlacePossibilities(placeRequest: String): List<WeatherPlacePossibility>
+    fun observeHourlyWeather(): Flow<List<HourlyForecast>>
 }
