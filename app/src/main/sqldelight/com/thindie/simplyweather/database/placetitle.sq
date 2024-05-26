@@ -21,8 +21,6 @@ updatePlaceTitle {
  INSERT OR IGNORE INTO Place (title, latitude, longitude)
   VALUES (:title, :latitude, :longitude);
 }
-
- deletePlaceTitleByCoordinates:
-  DELETE FROM Place
- WHERE latitude = :latitude AND longitude = :longitude;
-
+ deletePlaceByTitle:
+ DELETE FROM Place
+ WHERE title = :title;

@@ -46,9 +46,15 @@ class DetailPlaceViewModel(
 
             is DetailPlaceScreenEvent.DeletePlace -> {
                 viewModelScope.launch {
-                    repository.deleteWeather(
-                        latitude = latitude,
-                        longitude = longitude
+                    try {
+                        repository.deleteWeather(
+                            _state.value?.title.orEmpty()
+                        )
+                    } catch (_: Exception) {
+
+                    }
+                    routeFlow.emit(
+                        AppRouter.RouteEvent.AllPlaces
                     )
                 }
             }
@@ -116,7 +122,7 @@ class DetailPlaceViewModel(
                     ) { list, title ->
                         list to title
                     }
-                    .onEach { pair  ->
+                    .onEach { pair ->
                         val weather = pair.first
                         val title = pair.second
                         _state.update {

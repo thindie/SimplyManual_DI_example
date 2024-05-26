@@ -15,6 +15,7 @@ import com.thindie.simplyweather.presentation.add_place.viewmodel.AddPlaceViewMo
 import com.thindie.simplyweather.presentation.all_places.viewmodel.AllPlacesViewModel
 import com.thindie.simplyweather.presentation.detail_place.viewmodel.DetailPlaceViewModel
 import com.thindie.simplyweather.presentation.rename_place.viewmodel.RenamePlaceViewModel
+import com.thindie.simplyweather.presentation.stored_places.viewmodel.StoredPlaceViewModel
 import com.thindie.simplyweather.routing.AppRouter
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
@@ -129,6 +130,18 @@ class DependenciesProvider private constructor(private val context: Context) {
             modelClass: Class<T>,
         ): T {
             return AddPlaceViewModel(
+                repository = repository,
+                routeFlow = router.routeFlow
+            ) as T
+        }
+    }
+
+    val storedPlaceViewModelFactory = object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(
+            modelClass: Class<T>,
+        ): T {
+            return StoredPlaceViewModel(
                 repository = repository,
                 routeFlow = router.routeFlow
             ) as T

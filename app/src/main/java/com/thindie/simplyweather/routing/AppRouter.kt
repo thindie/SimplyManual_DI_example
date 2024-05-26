@@ -17,6 +17,8 @@ class AppRouter private constructor() {
         data object AllPlaces : RouteEvent()
         data object AddPlace : RouteEvent()
         data class RenamePlace(val latitude: String, val longitude: String) : RouteEvent()
+
+        data object StoredPlaces: RouteEvent()
     }
 
     companion object {
@@ -55,6 +57,8 @@ fun NavHostController.onRouteEvent(routeEvent: AppRouter.RouteEvent) {
                 )
             )
         }
+
+        AppRouter.RouteEvent.StoredPlaces -> forward(AppRouter.RouteEvent.StoredPlaces::class.java.name)
     }
 }
 

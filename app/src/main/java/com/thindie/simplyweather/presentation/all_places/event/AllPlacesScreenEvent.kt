@@ -8,4 +8,5 @@ sealed class AllPlacesScreenEvent {
     data object EnteringScreen : AllPlacesScreenEvent()
     data object RequestAddPlaceScreen : AllPlacesScreenEvent()
     data object EmptyForecast : AllPlacesScreenEvent()
+    data object RequestStoredPlaces: AllPlacesScreenEvent()
 }

@@ -95,13 +95,12 @@ class AllPlacesViewModel(
                     )
                 }
             }
-        }
-    }
 
-    private fun getFloatFromString(string: String): Float {
-        return string
-            .trim()
-            .take(5)
-            .toFloat()
+            AllPlacesScreenEvent.RequestStoredPlaces -> {
+                viewModelScope.launch {
+                    routeFlow.emit(AppRouter.RouteEvent.StoredPlaces)
+                }
+            }
+        }
     }
 }

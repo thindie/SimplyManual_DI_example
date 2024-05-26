@@ -26,9 +26,9 @@ fun Modifier.shimmerEffect(
 ): Modifier = composed {
     val appliedColorList = colorList.ifEmpty {
         listOf(
-            Color.LightGray,
+            Color.LightGray.copy(0.2f),
             Color.Transparent,
-            Color.LightGray
+            Color.LightGray.copy(0.2f)
         )
     }
 

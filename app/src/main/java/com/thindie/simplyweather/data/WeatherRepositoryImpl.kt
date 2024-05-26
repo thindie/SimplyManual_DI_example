@@ -17,6 +17,7 @@ import com.thindie.simplyweather.presentation.getTemporalAccessor
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
@@ -49,7 +50,7 @@ class WeatherRepositoryImpl(
                         ).toDailyForecastList()
                 }
             }
-
+            .catch { emit(emptyList()) }
     }
 
     override fun observeWeather(latitude: String, longitude: String): Flow<List<DailyForecast>> {
@@ -59,6 +60,19 @@ class WeatherRepositoryImpl(
                     it.latitude.toString() == latitude && it.longitude.toString() == longitude
                 }
             }
+    }
+
+    override fun observeStoredPlaces(): Flow<List<String>> {
+        return weatherDb.placetitleQueries
+            .getAllPlaces()
+            .asFlow()
+            .map {
+                it.executeAsList()
+            }
+            .map { list ->
+                list.map { it.title }
+            }
+            .catch { emit(emptyList()) }
     }
 
 
@@ -82,12 +96,11 @@ class WeatherRepositoryImpl(
                         )
                 }
             }
+            .catch { emit(emptyList()) }
     }
 
-    override suspend fun deleteWeather(latitude: String, longitude: String) {
-        weatherDb.placetitleQueries.deletePlaceTitleByCoordinates(
-            latitude, longitude
-        )
+    override suspend fun deleteWeather(title: String) {
+        weatherDb.placetitleQueries.deletePlaceByTitle(title)
     }
 
     override suspend fun updateWeather(title: String, latitude: Float, longitude: Float) {
@@ -99,6 +112,7 @@ class WeatherRepositoryImpl(
     override fun observePlaceTitle(latitude: String, longitude: String): Flow<String> {
         return weatherDb.placetitleQueries.getPlaceByCoordinates(latitude, longitude).asFlow()
             .map { it.executeAsOne() }
+            .catch { emit("") }
     }
 
     override suspend fun fetchHourlyWeather(

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -176,6 +179,27 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                         fontWeight = FontWeight.Black,
                         fontFamily = FontFamily.Monospace,
                     )
+                    Text(
+                        text = "нужно добавить новое место, или проверить соединение с интернет",
+                        modifier = Modifier.padding(horizontal = 48.dp),
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Light,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.LightGray
+                    )
+                    TextButton(
+                        onClick = { viewModel.onEvent(AllPlacesScreenEvent.RequestStoredPlaces) },
+                        contentPadding = PaddingValues(2.dp)
+                    ) {
+                        Text(
+                            text = "посмотреть сохраненные места",
+                            modifier = Modifier.padding(horizontal = 48.dp),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+
                     PrimaryButton(
                         modifier = Modifier.padding(all = 24.dp),
                         title = "Добавить",

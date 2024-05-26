@@ -10,6 +10,7 @@ import com.thindie.simplyweather.presentation.add_place.screen.addPlaceScreen
 import com.thindie.simplyweather.presentation.all_places.screen.allPlacesScreen
 import com.thindie.simplyweather.presentation.detail_place.screen.detailPlaceScreen
 import com.thindie.simplyweather.presentation.rename_place.screen.renamePlaceScreen
+import com.thindie.simplyweather.presentation.stored_places.screen.storedPlacesScreen
 import com.thindie.simplyweather.routing.AppRouter
 
 @Composable
@@ -23,6 +24,7 @@ fun WeatherApp(navHostController: NavHostController) {
             allPlacesScreen()
             addPlaceScreen()
             renamePlaceScreen()
+            storedPlacesScreen()
         }
     }
 }
