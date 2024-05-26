@@ -39,6 +39,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.End
+import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -125,38 +127,38 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                         .align(Alignment.Center)
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
-                            .height(64.dp),
+                           ,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         HeightSpacer(dp = 24.dp)
-                        Row(
+                        Text(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Добавить место",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Thin
-                            )
-                            IconButton(onClick = { viewModel.onEvent(AddPlaceScreenEvent.RequestAllPlacesScreen) }) {
+                                .padding(horizontal = 24.dp)
+                                .align(Start),
+                            text = "Добавить место",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Black,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                        IconButton(
+                            modifier = Modifier
+                                .align(End)
+                                .padding(all = 24.dp),
+                            onClick = { viewModel.onEvent(AddPlaceScreenEvent.RequestAllPlacesScreen) },
+                            content = {
                                 Icon(
                                     modifier = Modifier
-                                        .align(Alignment.CenterVertically)
-                                        .size(12.dp),
+                                        .size(24.dp),
                                     painter = rememberVectorPainter(image = Icons.Default.ArrowForward),
                                     contentDescription = "forward"
                                 )
                             }
-                        }
+                        )
                         HeightSpacer(dp = 24.dp)
                         Divider(
                             modifier = Modifier
@@ -192,7 +194,8 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                                     fontWeight = FontWeight.Light,
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.labelSmall,
-                                    text = "нужно указать название места")
+                                    text = "нужно указать название места"
+                                )
                             },
                             placeHolder = {
                                 Text(
@@ -212,7 +215,7 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                                 )
                             },
                         ) {
-                            Text("Попробовать найти по названию")
+                            Text("Сыскать по названию")
                         }
 
                         HeightSpacer(dp = 8.dp)
@@ -236,7 +239,8 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                                     fontWeight = FontWeight.Light,
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.labelSmall,
-                                    text = "широта должна быть заполнена")
+                                    text = "широта должна быть заполнена"
+                                )
                             },
                             placeHolder = {
                                 Text(
@@ -267,7 +271,8 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                                     fontWeight = FontWeight.Light,
                                     fontFamily = FontFamily.Monospace,
                                     style = MaterialTheme.typography.labelSmall,
-                                    text = "долгота должна быть заполнена")
+                                    text = "долгота должна быть заполнена"
+                                )
                             },
                             placeHolder = {
                                 Text(

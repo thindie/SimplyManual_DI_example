@@ -22,9 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -93,6 +95,17 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
+                    item {
+                        Text(
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp, vertical = 24.dp)
+                                .align(Alignment.Start),
+                            text = "Погода сейчас:",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Black,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                    }
                     items(state.forecast, key = CurrentWeather::hashCode) {
                         CurrentWeather(
                             currentWeather = it,
@@ -145,32 +158,24 @@ private fun Screen(viewModel: AllPlacesViewModel) {
             }
 
             TransitionState.None -> {
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(vertical = 24.dp)
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Column(
+                    Text(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.Center),
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 24.dp),
-                            text = "Пока нет добавленных  мест",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Thin
-                        )
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp)
-                        )
-                    }
+                            .padding(horizontal = 24.dp, vertical = 24.dp)
+                            .align(Start),
+                        text = "Пока ничего нет..",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Black,
+                        fontFamily = FontFamily.Monospace,
+                    )
                     PrimaryButton(
-                        modifier = Modifier.align(Alignment.BottomCenter),
+                        modifier = Modifier.padding(all = 24.dp),
                         title = "Добавить",
                         leadingIcon = {},
                         onClick = { viewModel.onEvent(AllPlacesScreenEvent.RequestAddPlaceScreen) }
@@ -192,7 +197,7 @@ private fun PreviewNotningNowToShow() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.Center),
-                horizontalAlignment = Alignment.Start,
+                horizontalAlignment = Start,
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 Text(

@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,9 +26,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,6 +48,7 @@ import com.thindie.simplyweather.presentation.rename_place.state.RenamePlaceScre
 import com.thindie.simplyweather.presentation.rename_place.viewmodel.RenamePlaceViewModel
 import com.thindie.simplyweather.routing.AppRouter
 import com.thindie.simplyweather.routing.OnBackPressedHandler
+import com.thindie.simplyweather.shimmerEffect
 
 fun NavGraphBuilder.renamePlaceScreen() {
     composable(
@@ -77,7 +84,9 @@ private fun Screen(viewModel: RenamePlaceViewModel) {
     ) {
         if (state.isTitleSuccessfulRenamed) {
             SimpleSnackBar(
-                modifier = Modifier.align(Alignment.TopCenter),
+                modifier = Modifier
+                    .zIndex(2f)
+                    .align(Alignment.TopCenter),
                 isSuccess = true,
                 message = "место успешно переименовано",
                 onDismiss = {
@@ -89,58 +98,72 @@ private fun Screen(viewModel: RenamePlaceViewModel) {
             TransitionState.Content -> {
                 Text(
                     modifier = Modifier
-                        .padding(start = 24.dp)
+                        .padding(all = 24.dp)
                         .align(Alignment.TopStart),
-                    text = "переименовать место",
-                    fontWeight = FontWeight.Thin,
-                    style = MaterialTheme.typography.labelSmall,
+                    text = "Переименовать",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Black,
+                    fontFamily = FontFamily.Monospace,
                 )
                 Column(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 24.dp, vertical = 24.dp)
                         .align(Alignment.Center)
                         .fillMaxWidth()
                         .fillMaxHeight(0.5f)
                 ) {
-                    Text(
-                        text = state.title,
-                        fontWeight = FontWeight.Black,
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    AppOutlinedTextField(
-                        transitionState = state.renameTransitionState,
-                        value = state.title,
-                        onValueChange = { viewModel.onEvent(RenamePlaceScreenEvent.RenameTitle(it)) },
-                        onClickTrailingIcon = { viewModel.onEvent(RenamePlaceScreenEvent.ClearInputField) },
-                        isError = state.title.isBlank(),
-                        placeHolder = {
-                            Text(
-                                text = "название..",
-                                fontStyle = FontStyle.Italic,
-                                fontWeight = FontWeight.Light,
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        },
-                        onError = {
-                            Text(
-                                fontWeight = FontWeight.Light,
-                                fontFamily = FontFamily.Monospace,
-                                style = MaterialTheme.typography.labelSmall,
-                                text = "поле не может быть пустым"
-                            )
-                        }
-                    )
-                }
 
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(24.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 24.dp),
+                            text = state.title,
+                            fontWeight = FontWeight.Black,
+                            style = MaterialTheme.typography.headlineMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        AppOutlinedTextField(
+                            transitionState = state.renameTransitionState,
+                            value = state.title,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                            onValueChange = {
+                                viewModel.onEvent(
+                                    RenamePlaceScreenEvent.RenameTitle(
+                                        it
+                                    )
+                                )
+                            },
+                            onClickTrailingIcon = { viewModel.onEvent(RenamePlaceScreenEvent.ClearInputField) },
+                            isError = state.title.isBlank(),
+                            placeHolder = {
+                                Text(
+                                    text = "название..",
+                                    fontStyle = FontStyle.Italic,
+                                    fontWeight = FontWeight.Light,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            onError = {
+                                Text(
+                                    fontWeight = FontWeight.Light,
+                                    fontFamily = FontFamily.Monospace,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    text = "поле не может быть пустым"
+                                )
+                            }
+                        )
+                    }
+                }
                 Row(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
+                        .padding(horizontal = 24.dp, vertical = 24.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     ClickableText(text = AnnotatedString("Вернуться"),
@@ -153,18 +176,28 @@ private fun Screen(viewModel: RenamePlaceViewModel) {
                             viewModel.onEvent(
                                 RenamePlaceScreenEvent.OnBack
                             )
-                        })
+                        }
+                    )
                     Spacer(modifier = Modifier.width(24.dp))
                     ClickableText(text = AnnotatedString("Принять"),
                         modifier = Modifier,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Medium,
                             fontSize = 18.sp,
+                            color = if (state.title.isNotBlank()) {
+                                LocalTextStyle.current.color
+                            } else {
+                                LocalTextStyle.current.color.copy(
+                                    0.3f
+                                )
+                            }
                         ),
                         onClick = {
-                            viewModel.onEvent(
-                                RenamePlaceScreenEvent.ApplyRenameTitle
-                            )
+                            if (state.title.isNotBlank()) {
+                                viewModel.onEvent(
+                                    RenamePlaceScreenEvent.ApplyRenameTitle
+                                )
+                            }
                         }
                     )
                 }
@@ -172,7 +205,20 @@ private fun Screen(viewModel: RenamePlaceViewModel) {
             }
 
             TransitionState.Error -> {}
-            TransitionState.Loading -> {}
+            TransitionState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Spacer(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .fillMaxWidth(0.7f)
+                            .height(36.dp)
+                            .shimmerEffect(MaterialTheme.shapes.medium)
+                    )
+                }
+            }
+
             TransitionState.None -> {}
         }
     }

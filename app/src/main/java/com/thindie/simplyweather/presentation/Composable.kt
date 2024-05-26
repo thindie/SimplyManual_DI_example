@@ -40,7 +40,7 @@ fun PrimaryButton(
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = title,
-            fontWeight = FontWeight.Thin,
+            fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.labelSmall
         )
     }

@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -29,11 +28,21 @@ class RenamePlaceViewModel(
     fun onEvent(event: RenamePlaceScreenEvent) {
         when (event) {
             RenamePlaceScreenEvent.ApplyRenameTitle -> {
-                try {
+                viewModelScope.launch {
+                    try {
+                        repository.updateWeather(
+                            latitude, longitude, _state.value.title
+                        )
+                        _state.update {
+                            it.copy(
+                                isTitleSuccessfulRenamed = true
+                            )
+                        }
+                    } catch (_: Exception) {
 
-                } catch (_: Exception) {
-
+                    }
                 }
+
             }
 
             RenamePlaceScreenEvent.ClearInputField -> {
@@ -61,7 +70,29 @@ class RenamePlaceViewModel(
             }
 
             RenamePlaceScreenEvent.OnRequestRenameTitle -> {
-
+                repository
+                    .observePlaceTitle(
+                        latitude, longitude
+                    )
+                    .onStart {
+                        _state.update {
+                            it.copy(
+                                renameTransitionState = TransitionState.Loading
+                            )
+                        }
+                    }
+                    .onEach { title ->
+                        _state.update {
+                            it.copy(
+                                title = title,
+                                renameTransitionState = if (title.isBlank()) {
+                                    TransitionState.Loading
+                                } else {
+                                    TransitionState.Content
+                                }
+                            )
+                        }
+                    }.launchIn(viewModelScope)
             }
 
             is RenamePlaceScreenEvent.RenameTitle -> {
