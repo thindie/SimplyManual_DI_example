@@ -36,7 +36,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.thindie.simplyweather.di.DependenciesProvider
-import com.thindie.simplyweather.domain.CurrentWeather
 import com.thindie.simplyweather.presentation.PrimaryButton
 import com.thindie.simplyweather.presentation.TransitionState
 import com.thindie.simplyweather.presentation.add_place.screen.HeightSpacer
@@ -106,15 +105,16 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                             fontFamily = FontFamily.Monospace,
                         )
                     }
-                    items(state.forecast, key = CurrentWeather::hashCode) {
+                    val list = state.forecast.toList()
+                    items(list) {
                         CurrentWeather(
-                            currentWeather = it,
-                            currentWeatherTitle = "empty",
+                            currentWeather = it.second,
+                            currentWeatherTitle = it.first,
                             onClick = {
                                 viewModel
                                     .onEvent(
                                         AllPlacesScreenEvent.RequestPlaceDetails(
-                                            it
+                                            it.second
                                         )
                                     )
                             }
@@ -126,6 +126,8 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                             color = Color.Black
                         )
                     }
+
+
                     item {
                         PrimaryButton(
                             title = "Добавить место",

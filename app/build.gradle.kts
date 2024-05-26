@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.sqldelight)
 }
 
 android {
@@ -49,6 +50,14 @@ android {
         }
     }
 }
+sqldelight {
+    databases {
+        create("WeatherDb") {
+            packageName = "com.thindie.simplyweather.database"
+                srcDirs("src/main/sqldelight")
+        }
+    }
+}
 
 dependencies {
 
@@ -66,7 +75,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
-
+    implementation(libs.sqldelight.android.driver)
+    api(libs.sqldelight.coroutines)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

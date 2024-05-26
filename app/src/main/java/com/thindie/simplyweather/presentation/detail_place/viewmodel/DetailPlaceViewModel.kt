@@ -9,6 +9,7 @@ import com.thindie.simplyweather.presentation.detail_place.viewstate.DetailScree
 import com.thindie.simplyweather.routing.AppRouter
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -36,8 +37,8 @@ class DetailPlaceViewModel(
                 viewModelScope.launch {
                     repository.updateWeather(
                         title = event.title,
-                        latitude = latitude,
-                        longitude = longitude
+                        latitude = getFloatFromString(latitude),
+                        longitude = getFloatFromString(longitude)
                     )
                 }
 
@@ -109,10 +110,19 @@ class DetailPlaceViewModel(
                             )
                         }
                     }
-                    .onEach { weather ->
+                    .combine(
+                        repository
+                            .observePlaceTitle(latitude, longitude)
+                    ) { list, title ->
+                        list to title
+                    }
+                    .onEach { pair  ->
+                        val weather = pair.first
+                        val title = pair.second
                         _state.update {
                             it?.copy(
                                 weeklyForecast = weather,
+                                title = title,
                                 transitionState = if (weather.isEmpty()) {
                                     TransitionState.None
                                 } else {
@@ -120,7 +130,7 @@ class DetailPlaceViewModel(
                                 }
                             )
                                 ?: DetailScreenState(
-                                    title = "",
+                                    title = title,
                                     weeklyForecast = weather,
                                     transitionState = if (weather.isEmpty()) {
                                         TransitionState.None
@@ -162,5 +172,12 @@ class DetailPlaceViewModel(
                 }
             }
         }
+    }
+
+    private fun getFloatFromString(string: String): Float {
+        return string
+            .trim()
+            .take(5)
+            .toFloat()
     }
 }

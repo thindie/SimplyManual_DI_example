@@ -1,0 +1,28 @@
+CREATE TABLE Place (
+    title TEXT PRIMARY KEY NOT NULL,
+    latitude TEXT NOT NULL,
+    longitude TEXT NOT NULL
+);
+
+getAllPlaces:
+SELECT * FROM Place;
+
+getPlaceByCoordinates:
+SELECT title FROM Place
+ WHERE latitude = :latitude AND longitude = :longitude
+ LIMIT 1
+ ;
+
+updatePlaceTitle {
+ UPDATE Place
+ SET title = :title
+ WHERE latitude = :latitude AND longitude = :longitude;
+
+ INSERT OR IGNORE INTO Place (title, latitude, longitude)
+  VALUES (:title, :latitude, :longitude);
+}
+
+ deletePlaceTitleByCoordinates:
+  DELETE FROM Place
+ WHERE latitude = :latitude AND longitude = :longitude;
+

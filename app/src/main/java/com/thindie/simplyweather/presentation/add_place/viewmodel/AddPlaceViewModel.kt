@@ -71,7 +71,8 @@ class AddPlaceViewModel(
                     validateLongitude()
                     if (_state.value.isInputFieldsIsNotError) {
                         try {
-                            repository.fetchWeather(
+                            repository.updateWeather(
+                                title = _state.value.placeTitle,
                                 latitude = getFloatFromString(_state.value.latitude),
                                 longitude = getFloatFromString(_state.value.longitude),
                             )

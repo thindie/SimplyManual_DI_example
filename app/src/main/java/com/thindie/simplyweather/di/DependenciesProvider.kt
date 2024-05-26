@@ -1,11 +1,15 @@
 package com.thindie.simplyweather.di
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.thindie.simplyweather.MainActivity
 import com.thindie.simplyweather.data.ApiService
 import com.thindie.simplyweather.data.PlaceDetectionApiService
 import com.thindie.simplyweather.data.WeatherRepositoryImpl
+import com.thindie.simplyweather.database.WeatherDb
 import com.thindie.simplyweather.domain.WeatherRepository
 import com.thindie.simplyweather.presentation.add_place.viewmodel.AddPlaceViewModel
 import com.thindie.simplyweather.presentation.all_places.viewmodel.AllPlacesViewModel
@@ -20,11 +24,14 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 private const val BASE_URL = "https://api.open-meteo.com"
 
-class DependenciesProvider private constructor() {
+class DependenciesProvider private constructor(private val context: Context) {
+
+    private lateinit var sqlDriver: SqlDriver
+    private lateinit var weatherDb: WeatherDb
 
     companion object {
-        fun getInstance(dependenciesHolder: DependenciesHolder) {
-            dependenciesHolder.setDependenciesProvider(DependenciesProvider())
+        fun getInstance(dependenciesHolder: DependenciesHolder, context: Context) {
+            dependenciesHolder.setDependenciesProvider(DependenciesProvider(context))
         }
     }
 
@@ -72,11 +79,37 @@ class DependenciesProvider private constructor() {
             .baseUrl("https://nominatim.openstreetmap.org")
             .build()
 
+    private fun getSqlDriver(context: Context): SqlDriver {
+        return if (::sqlDriver.isInitialized) {
+            sqlDriver
+        } else {
+            sqlDriver = AndroidSqliteDriver(
+                WeatherDb.Schema,
+                context,
+                name = "WeatherTitleDb"
+            )
+            sqlDriver
+        }
+    }
+
+    private fun getWeatherTitleDb(): WeatherDb {
+        val sqlDriver by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+            getSqlDriver(context)
+        }
+        return if (::weatherDb.isInitialized) {
+            weatherDb
+        } else {
+            weatherDb = WeatherDb(sqlDriver)
+            weatherDb
+        }
+    }
+
     private val apiService: ApiService = retrofit.create(ApiService::class.java)
     private val placeDetection: PlaceDetectionApiService =
         placeDetectionRetrofit.create(PlaceDetectionApiService::class.java)
 
-    private val repository: WeatherRepository = WeatherRepositoryImpl(apiService, placeDetection)
+    private val repository: WeatherRepository =
+        WeatherRepositoryImpl(apiService, placeDetection, getWeatherTitleDb())
 
     val allPlacesViewModelFactory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
@@ -145,6 +178,7 @@ class DependenciesProvider private constructor() {
             ) as T
         }
     }
+
     fun getRenameScreenViewModelFactory(
         latitude: String,
         longitude: String,

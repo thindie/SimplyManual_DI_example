@@ -9,8 +9,11 @@ import com.thindie.simplyweather.presentation.all_places.viewstate.AllPlacesStat
 import com.thindie.simplyweather.routing.AppRouter
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -36,15 +39,25 @@ class AllPlacesViewModel(
                     try {
                         repository
                             .observeCurrentWeather()
-                            .onEach { list ->
+                            .map {
+                                it.associateBy { currentWeather ->
+                                    repository.observePlaceTitle(
+                                        currentWeather.latitude.toString(),
+                                        currentWeather.longitude.toString()
+                                    )
+                                        .firstOrNull()
+                                        .orEmpty()
+                                }
+                            }
+                            .onEach { forecastMap ->
                                 _screenState.update {
                                     it.copy(
-                                        transitionState = if (list.isEmpty()) {
+                                        transitionState = if (forecastMap.isEmpty()) {
                                             TransitionState.None
                                         } else {
                                             TransitionState.Content
                                         },
-                                        forecast = list
+                                        forecast = forecastMap
                                     )
                                 }
                             }
@@ -83,5 +96,12 @@ class AllPlacesViewModel(
                 }
             }
         }
+    }
+
+    private fun getFloatFromString(string: String): Float {
+        return string
+            .trim()
+            .take(5)
+            .toFloat()
     }
 }

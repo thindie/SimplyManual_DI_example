@@ -31,7 +31,9 @@ class RenamePlaceViewModel(
                 viewModelScope.launch {
                     try {
                         repository.updateWeather(
-                            latitude, longitude, _state.value.title
+                            _state.value.title,
+                            getFloatFromString(latitude),
+                            getFloatFromString(longitude)
                         )
                         _state.update {
                             it.copy(
@@ -103,5 +105,11 @@ class RenamePlaceViewModel(
                 }
             }
         }
+    }
+    private fun getFloatFromString(string: String): Float {
+        return string
+            .trim()
+            .take(5)
+            .toFloat()
     }
 }

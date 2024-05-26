@@ -17,7 +17,7 @@ class WeatherApplication : Application(), DependenciesProvider.DependenciesHolde
 
     override fun getDependenciesProvider(): DependenciesProvider {
         if (!::dependenciesProvider.isInitialized) {
-            DependenciesProvider.getInstance(this)
+            DependenciesProvider.getInstance(this, this)
         }
         return dependenciesProvider
     }
