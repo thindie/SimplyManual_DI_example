@@ -1,5 +1,8 @@
 package com.thindie.simplyweather.domain
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class HourlyForecast(
     val apparentTemperature: Double,
     val precipitation: Double,

@@ -1,5 +1,8 @@
 package com.thindie.simplyweather.domain
 
+import androidx.compose.runtime.Stable
+
+@Stable
 data class WeeklyForecast(
     val latitude: Float,
     val longitude: Float,
