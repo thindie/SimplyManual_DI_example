@@ -1,3 +1,31 @@
 <resources>
     <string name="app_name">simplyWeather</string>
+    <string name="weathercode_0">Ясно</string>
+    <string name="weathercode_1">"В основном Ясно"</string>
+    <string name="weathercode_3">Пасмурно</string>
+    <string name="weathercode_2">"Небольшая Облачность"</string>
+    <string name="weathercode_45">Туман</string>
+    <string name="weathercode_48">"Туман и изморозь"</string>
+    <string name="weathercode_51">Морось</string>
+    <string name="weathercode_53">"Противная Морось"</string>
+    <string name="weathercode_55">"Противнейшая Морось"</string>
+    <string name="weathercode_56">"Легкая Изморозь"</string>
+    <string name="weathercode_57">Изморозь!</string>
+    <string name="weathercode_61">Дождик</string>
+    <string name="weathercode_63">Дождь</string>
+    <string name="weathercode_65">"Сильный Дождь"</string>
+    <string name="weathercode_66">"Ледяной Дождь"</string>
+    <string name="weathercode_67">"*№*?! Ледяной Дождь!!"</string>
+    <string name="weathercode_71">"Небольшой снег"</string>
+    <string name="weathercode_73">Снег</string>
+    <string name="weathercode_75">"Сильный Снег"</string>
+    <string name="weathercode_77">Град</string>
+    <string name="weathercode_80">"Небольшой Ливень"</string>
+    <string name="weathercode_81">Ливень</string>
+    <string name="weathercode_82">Льет</string>
+    <string name="weathercode_85">Снегопад</string>
+    <string name="weathercode_86">"Сильный Снегопад"</string>
+    <string name="weathercode_95">"Небольшая Гроза"</string>
+    <string name="weathercode_96">Гроза</string>
+    <string name="weathercode_99">Грозище</string>
 </resources>
