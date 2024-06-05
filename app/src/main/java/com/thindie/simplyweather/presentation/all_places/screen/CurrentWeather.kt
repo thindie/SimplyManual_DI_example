@@ -17,12 +17,15 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.thindie.simplyweather.domain.CurrentWeather
 import com.thindie.simplyweather.presentation.theme.SimplyWeatherTheme
+import com.thindie.simplyweather.presentation.weatherNotation
 import okhttp3.internal.format
 
 @Composable
@@ -36,20 +39,22 @@ fun CurrentWeather(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 24.dp),
+                .padding(horizontal = 24.dp),
             horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = currentWeather.apparentTemperature.toString(),
                 modifier = Modifier,
                 fontWeight = FontWeight.Black,
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
+                color = if (currentWeather.apparentTemperature > 0) Color.Red else
+                    Color.Black.copy(0.7f)
             )
             Spacer(modifier = Modifier.width(12.dp))
             TextButton(
                 onClick = onClick,
-                contentPadding = PaddingValues(2.dp)
+                contentPadding = PaddingValues(4.dp),
             ) {
                 Text(
                     text = currentWeatherTitle,
@@ -60,6 +65,11 @@ fun CurrentWeather(
                 )
             }
         }
+        Text(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            text = stringResource(id = weatherNotation(currentWeather.weatherCode)),
+            style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()

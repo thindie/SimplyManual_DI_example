@@ -2,7 +2,6 @@ package com.thindie.simplyweather.presentation.all_places.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -31,7 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,7 +44,6 @@ import com.thindie.simplyweather.presentation.add_place.screen.HeightSpacer
 import com.thindie.simplyweather.presentation.all_places.event.AllPlacesScreenEvent
 import com.thindie.simplyweather.presentation.all_places.viewmodel.AllPlacesViewModel
 import com.thindie.simplyweather.presentation.all_places.viewstate.AllPlacesState
-import com.thindie.simplyweather.presentation.theme.SimplyWeatherTheme
 import com.thindie.simplyweather.routing.AppRouter
 import com.thindie.simplyweather.routing.OnBackPressedHandler
 import kotlinx.coroutines.delay
@@ -126,7 +124,8 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                             modifier = Modifier
                                 .padding(horizontal = 24.dp)
                                 .fillMaxWidth(),
-                            color = Color.Black
+                            color = Color.Black,
+                            thickness = Dp.Hairline
                         )
                     }
 
@@ -153,7 +152,7 @@ private fun Screen(viewModel: AllPlacesViewModel) {
             TransitionState.Loading -> {
                 AllPlaceShimmer()
                 LaunchedEffect(key1 = Unit) {
-                    delay(2.seconds)
+                    delay(1.seconds)
                     if (state.forecast.isEmpty()) {
                         viewModel.onEvent(
                             AllPlacesScreenEvent.EmptyForecast
@@ -208,42 +207,6 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                     )
                 }
             }
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewNotningNowToShow() {
-    SimplyWeatherTheme {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center),
-                horizontalAlignment = Start,
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    text = "Пока нет добавленных  мест",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Thin
-                )
-                Divider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                )
-            }
-            PrimaryButton(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                title = "Добавить",
-                leadingIcon = {},
-                onClick = { }
-            )
         }
     }
 }
