@@ -5,36 +5,38 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Divider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.thindie.simplyweather.domain.CurrentWeather
-import com.thindie.simplyweather.presentation.theme.SimplyWeatherTheme
 import com.thindie.simplyweather.presentation.weatherNotation
 import okhttp3.internal.format
-
+@Suppress("LongParameterList")
 @Composable
 fun CurrentWeather(
     modifier: Modifier = Modifier,
     currentWeather: CurrentWeather,
     currentWeatherTitle: String,
+    expectedPrecipitationTime: String,
     onClick: () -> Unit,
+    onExpect: () -> Unit,
 ) {
+    LaunchedEffect(key1 = currentWeather.precipitation > 0) {
+        onExpect.invoke()
+    }
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
@@ -83,6 +85,7 @@ fun CurrentWeather(
                 color = LocalTextStyle.current.color.copy(0.5f),
                 style = MaterialTheme.typography.labelLarge,
             )
+            Text(text = expectedPrecipitationTime)
             Text(
                 text = format("осадки %s мм", currentWeather.precipitation.toString()),
                 modifier = Modifier,
@@ -94,40 +97,3 @@ fun CurrentWeather(
     }
 }
 
-
-@Preview
-@Composable
-private fun PreviewCurrentWeather() {
-    SimplyWeatherTheme {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            repeat(2) {
-                CurrentWeather(
-                    currentWeather = CurrentWeather(
-                        latitude = 16.17f,
-                        longitude = 18.19f,
-                        apparentTemperature = -20.21,
-                        interval = 8567,
-                        isDay = false,
-                        precipitation = 22.23,
-                        rain = 24.25,
-                        relativeHumidity2m = 7525,
-                        snowfall = 26.27,
-                        time = "deseruisse",
-                        weatherCode = 7459,
-                        windDirection10m = 5351,
-                        windGusts10m = 28.29,
-                        windSpeed10m = 30.31
-                    ),
-                    currentWeatherTitle = "dadasdasdadadasdsadasdadsadadasdasdasdadasdasd"
-                ) {
-
-                }
-                Divider()
-            }
-        }
-    }
-}

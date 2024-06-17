@@ -83,8 +83,8 @@ private fun Screen(viewModel: AllPlacesViewModel) {
             .navigationBarsPadding()
             .imePadding()
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         when (state.transitionState) {
             TransitionState.Content -> {
@@ -108,6 +108,12 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                     }
                     val list = state.forecast.toList()
                     items(list) {
+                        val precipitationTime =
+                            state.expectedPrecipitationEvents
+                                .firstOrNull { time ->
+                                    time.latitude == it.second.latitude.toString()
+                                            && time.longitude == it.second.latitude.toString()
+                                }
                         CurrentWeather(
                             currentWeather = it.second,
                             currentWeatherTitle = it.first,
@@ -118,7 +124,15 @@ private fun Screen(viewModel: AllPlacesViewModel) {
                                             it.second
                                         )
                                     )
-                            }
+                            },
+                            onExpect = {
+                                viewModel.onEvent(
+                                    AllPlacesScreenEvent.RequestPrecipitationTime(
+                                        it.second
+                                    )
+                                )
+                            },
+                            expectedPrecipitationTime = precipitationTime?.time.orEmpty()
                         )
                         Divider(
                             modifier = Modifier

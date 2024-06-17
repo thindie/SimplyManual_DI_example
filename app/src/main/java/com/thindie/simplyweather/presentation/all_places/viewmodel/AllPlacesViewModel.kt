@@ -9,7 +9,6 @@ import com.thindie.simplyweather.presentation.all_places.viewstate.AllPlacesStat
 import com.thindie.simplyweather.routing.AppRouter
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
@@ -37,31 +36,24 @@ class AllPlacesViewModel(
                 viewModelScope.launch {
                     _screenState.update { it.copy(transitionState = TransitionState.Loading) }
                     try {
-                        repository
-                            .observeCurrentWeather()
-                            .map {
-                                it.associateBy { currentWeather ->
-                                    repository.observePlaceTitle(
-                                        currentWeather.latitude.toString(),
-                                        currentWeather.longitude.toString()
-                                    )
-                                        .firstOrNull()
-                                        .orEmpty()
-                                }
+                        repository.observeCurrentWeather().map {
+                            it.associateBy { currentWeather ->
+                                repository.observePlaceTitle(
+                                    currentWeather.latitude.toString(),
+                                    currentWeather.longitude.toString()
+                                ).firstOrNull().orEmpty()
                             }
-                            .onEach { forecastMap ->
-                                _screenState.update {
-                                    it.copy(
-                                        transitionState = if (forecastMap.isEmpty()) {
-                                            TransitionState.None
-                                        } else {
-                                            TransitionState.Content
-                                        },
-                                        forecast = forecastMap
-                                    )
-                                }
+                        }.onEach { forecastMap ->
+                            _screenState.update {
+                                it.copy(
+                                    transitionState = if (forecastMap.isEmpty()) {
+                                        TransitionState.None
+                                    } else {
+                                        TransitionState.Content
+                                    }, forecast = forecastMap
+                                )
                             }
-                            .launchIn(viewModelScope)
+                        }.launchIn(viewModelScope)
 
                     } catch (e: Exception) {
                         _screenState.update {
@@ -99,6 +91,16 @@ class AllPlacesViewModel(
             AllPlacesScreenEvent.RequestStoredPlaces -> {
                 viewModelScope.launch {
                     routeFlow.emit(AppRouter.RouteEvent.StoredPlaces)
+                }
+            }
+
+            is AllPlacesScreenEvent.RequestPrecipitationTime -> {
+                viewModelScope.launch {
+                    repository.observeNearestPrecipitation(
+                        event.weather.latitude.toString(), event.weather.longitude.toString()
+                    ).onEach { precipitationTime ->
+                        _screenState.update { it.copy(expectedPrecipitationEvents = it.expectedPrecipitationEvents.toMutableList() + precipitationTime) }
+                    }.launchIn(this)
                 }
             }
         }

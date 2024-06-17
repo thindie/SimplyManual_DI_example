@@ -189,7 +189,6 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 24.dp),
-                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         items(state.weeklyForecast, key = DailyForecast::hashCode) {
                             Row(modifier = Modifier
@@ -197,9 +196,7 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                                 .clip(MaterialTheme.shapes.medium)
                                 .clickable {
                                     viewModel.onEvent(
-                                        DetailPlaceScreenEvent.RequestHourlyForecast(
-                                            it
-                                        )
+                                        DetailPlaceScreenEvent.RequestHourlyForecast(it)
                                     )
                                 }
                                 .height(72.dp),
@@ -274,6 +271,7 @@ private fun Screen(viewModel: DetailPlaceViewModel) {
                             Divider(
                                 modifier = Modifier.fillMaxWidth(), thickness = Dp.Hairline
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
                         }
                         item {
                             HeightSpacer(dp = 24.dp)

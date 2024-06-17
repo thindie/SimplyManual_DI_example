@@ -24,12 +24,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -128,14 +130,13 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
+                    HeightSpacer(dp = 24.dp)
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                           ,
+                            .fillMaxWidth(0.9f),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        HeightSpacer(dp = 24.dp)
                         Text(
                             modifier = Modifier
                                 .padding(horizontal = 24.dp)
@@ -145,28 +146,38 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                             fontWeight = FontWeight.Black,
                             fontFamily = FontFamily.Monospace,
                         )
-                        IconButton(
+                        AssistChip(
+                            enabled = state.detectionPlaceTransitionState !is TransitionState.Loading,
                             modifier = Modifier
                                 .align(End)
-                                .padding(all = 24.dp),
+                                .padding(vertical = 24.dp),
                             onClick = { viewModel.onEvent(AddPlaceScreenEvent.RequestAllPlacesScreen) },
-                            content = {
+                            label = {
+                                Text(
+                                    text = "все места",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontFamily = FontFamily.Cursive,
+                                    color = LocalContentColor.current.copy(0.3f)
+                                )
+                            },
+                            trailingIcon = {
                                 Icon(
                                     modifier = Modifier
                                         .size(24.dp),
                                     painter = rememberVectorPainter(image = Icons.Default.ArrowForward),
-                                    contentDescription = "forward"
+                                    contentDescription = "forward",
+                                    tint = LocalContentColor.current.copy(0.3f)
                                 )
                             }
                         )
-                        HeightSpacer(dp = 24.dp)
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp)
-                        )
                     }
 
+                    HeightSpacer(dp = 24.dp)
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp)
+                    )
                     Column(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -284,6 +295,7 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                             }
                         )
                     }
+                    Spacer(modifier = Modifier.weight(1f, true))
                     PrimaryButton(
                         onClick = { viewModel.onEvent(AddPlaceScreenEvent.AddPlaceApply) },
                         enabled = state.transitionState == TransitionState.Content,
@@ -298,132 +310,132 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                 }
             }
         }
-        when (state.detectionPlaceTransitionState) {
-            TransitionState.None -> {}
-            TransitionState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .align(Alignment.TopCenter),
-                    )
-                }
-            }
-
-            else -> ModalBottomSheet(
-                onDismissRequest = { viewModel.onEvent(AddPlaceScreenEvent.DismissPlaceDetection) }
+    }
+    when (state.detectionPlaceTransitionState) {
+        TransitionState.None -> {}
+        TransitionState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                LazyColumn(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    when (state.detectionPlaceTransitionState) {
-                        TransitionState.Content -> {
-                            stickyHeader {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(72.dp)
-                                        .clip(MaterialTheme.shapes.large),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Место",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                    Text(
-                                        text = "Координаты",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Light
-                                    )
-                                }
-                            }
-                            items(
-                                items = state.weatherPlacePossibility,
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .align(Alignment.TopCenter),
+                )
+            }
+        }
+
+        else -> ModalBottomSheet(
+            onDismissRequest = { viewModel.onEvent(AddPlaceScreenEvent.DismissPlaceDetection) }
+        ) {
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                when (state.detectionPlaceTransitionState) {
+                    TransitionState.Content -> {
+                        stickyHeader {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                                    .clip(MaterialTheme.shapes.large),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(72.dp)
-                                        .clip(MaterialTheme.shapes.large)
-                                        .clickable {
-                                            viewModel.onEvent(
-                                                AddPlaceScreenEvent.ApplyPlaceDetection(
-                                                    it
-                                                )
-                                            )
-                                        },
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        modifier = Modifier,
-                                        text = it.displayName.take(15),
-                                        maxLines = 1,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    Text(
-                                        modifier = Modifier,
-                                        text = it.latitude.take(5),
-                                        maxLines = 1,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Thin,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                    Text(
-                                        modifier = Modifier,
-                                        text = it.longitude.take(5),
-                                        maxLines = 1,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Thin,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                }
-                                Divider(
-                                    modifier = Modifier.fillMaxWidth(0.7f),
-                                    thickness = Dp.Hairline
+                                Text(
+                                    text = "Место",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "Координаты",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Light
                                 )
                             }
-                            item {
+                        }
+                        items(
+                            items = state.weatherPlacePossibility,
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(72.dp)
+                                    .clip(MaterialTheme.shapes.large)
+                                    .clickable {
+                                        viewModel.onEvent(
+                                            AddPlaceScreenEvent.ApplyPlaceDetection(
+                                                it
+                                            )
+                                        )
+                                    },
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    modifier = Modifier,
+                                    text = it.displayName.take(15),
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    modifier = Modifier,
+                                    text = it.latitude.take(5),
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Thin,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    modifier = Modifier,
+                                    text = it.longitude.take(5),
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Thin,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                            Divider(
+                                modifier = Modifier.fillMaxWidth(0.7f),
+                                thickness = Dp.Hairline
+                            )
+                        }
+                        item {
+                            HeightSpacer(dp = 72.dp)
+                        }
+                    }
+
+                    TransitionState.Error -> {
+                        item {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                HeightSpacer(dp = 72.dp)
+                                Text(
+                                    text = "Похоже, ничего не нашлось",
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                                HeightSpacer(dp = 8.dp)
+                                Text(
+                                    text = "Нужно уточнить запрос",
+                                    fontWeight = FontWeight.Medium,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                                 HeightSpacer(dp = 72.dp)
                             }
+
                         }
-
-                        TransitionState.Error -> {
-                            item {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    HeightSpacer(dp = 72.dp)
-                                    Text(
-                                        text = "Похоже, ничего не нашлось",
-                                        fontWeight = FontWeight.Bold,
-                                        style = MaterialTheme.typography.headlineSmall
-                                    )
-                                    HeightSpacer(dp = 8.dp)
-                                    Text(
-                                        text = "Нужно уточнить запрос",
-                                        fontWeight = FontWeight.Medium,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                    HeightSpacer(dp = 72.dp)
-                                }
-
-                            }
-                        }
-
-                        else -> {}
                     }
-                    item {
-                        HeightSpacer(dp = 72.dp)
-                    }
+
+                    else -> {}
+                }
+                item {
+                    HeightSpacer(dp = 72.dp)
                 }
             }
         }

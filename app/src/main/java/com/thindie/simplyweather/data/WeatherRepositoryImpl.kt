@@ -11,14 +11,20 @@ import com.thindie.simplyweather.database.WeatherDb
 import com.thindie.simplyweather.domain.CurrentWeather
 import com.thindie.simplyweather.domain.DailyForecast
 import com.thindie.simplyweather.domain.HourlyForecast
+import com.thindie.simplyweather.domain.PrecipitationTime
 import com.thindie.simplyweather.domain.WeatherPlacePossibility
 import com.thindie.simplyweather.domain.WeatherRepository
 import com.thindie.simplyweather.presentation.getTemporalAccessor
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -157,6 +163,30 @@ class WeatherRepositoryImpl(
 
     override fun observeHourlyWeather(): Flow<List<HourlyForecast>> {
         return cacheHourly
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun observeNearestPrecipitation(
+        latitude: String,
+        longitude: String,
+    ): Flow<PrecipitationTime> {
+        observeWeather(latitude, longitude)
+            .flatMapLatest {
+                val currentDayForecast = it.firstOrNull()
+                if (currentDayForecast == null) emptyFlow() else flowOf(currentDayForecast)
+            }
+            .onEach {
+                fetchHourlyWeather(latitude, longitude, it)
+            }
+
+        return cacheHourly.flatMapLatest {
+            val firstPrecipitation = it.firstOrNull { it.precipitation > 0 }
+            if (firstPrecipitation == null) emptyFlow() else flowOf(
+                PrecipitationTime(
+                    latitude = latitude, longitude = longitude, time = firstPrecipitation.time
+                )
+            )
+        }
     }
 }
 

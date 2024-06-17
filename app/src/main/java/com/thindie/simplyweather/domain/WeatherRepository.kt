@@ -17,4 +17,5 @@ interface WeatherRepository {
     )
     suspend fun getWeatherPlacePossibilities(placeRequest: String): List<WeatherPlacePossibility>
     fun observeHourlyWeather(): Flow<List<HourlyForecast>>
+    fun observeNearestPrecipitation(latitude: String, longitude: String): Flow<PrecipitationTime>
 }
