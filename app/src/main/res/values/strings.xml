@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">simplyWeather</string>
+    <string name="app_name">"Simply Weather"</string>
     <string name="weathercode_0">Ясно</string>
     <string name="weathercode_1">"В основном Ясно"</string>
     <string name="weathercode_3">Пасмурно</string>
