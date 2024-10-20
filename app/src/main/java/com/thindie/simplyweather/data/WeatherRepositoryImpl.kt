@@ -1,18 +1,15 @@
 package com.thindie.simplyweather.data
 
 import app.cash.sqldelight.coroutines.asFlow
-import com.thindie.simplyweather.data.dto.placedetectiondto.PlacesDetectionDtoItem
 import com.thindie.simplyweather.data.mappers.toCurrentWeather
 import com.thindie.simplyweather.data.mappers.toDailyForecastList
 import com.thindie.simplyweather.data.mappers.toHourlyForecastList
-import com.thindie.simplyweather.data.mappers.toWeatherPlacePossibility
 import com.thindie.simplyweather.data.mappers.toWeeklyForecast
 import com.thindie.simplyweather.database.WeatherDb
 import com.thindie.simplyweather.domain.CurrentWeather
 import com.thindie.simplyweather.domain.DailyForecast
 import com.thindie.simplyweather.domain.HourlyForecast
 import com.thindie.simplyweather.domain.PrecipitationTime
-import com.thindie.simplyweather.domain.WeatherPlacePossibility
 import com.thindie.simplyweather.domain.WeatherRepository
 import com.thindie.simplyweather.presentation.getTemporalAccessor
 import java.time.format.DateTimeFormatter
@@ -26,12 +23,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromJsonElement
 
 class WeatherRepositoryImpl(
     private val apiService: ApiService,
-    private val placeDetectionApiService: PlaceDetectionApiService,
     private val weatherDb: WeatherDb,
 ) : WeatherRepository {
     private val cacheHourly = MutableStateFlow<List<HourlyForecast>>(emptyList())
@@ -145,19 +139,6 @@ class WeatherRepositoryImpl(
         )
         cacheHourly.update {
             hourly.hourly.toHourlyForecastList()
-        }
-    }
-
-    override suspend fun getWeatherPlacePossibilities(placeRequest: String): List<WeatherPlacePossibility> {
-        return try {
-            val placesResponse = placeDetectionApiService.getCoordinates(
-                city = placeRequest
-            )
-            placesResponse.map {
-                Json.decodeFromJsonElement<PlacesDetectionDtoItem>(it)
-            }.map(PlacesDetectionDtoItem::toWeatherPlacePossibility)
-        } catch (_: Exception) {
-            emptyList()
         }
     }
 

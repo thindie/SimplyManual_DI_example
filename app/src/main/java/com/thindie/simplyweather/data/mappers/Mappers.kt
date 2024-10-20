@@ -3,11 +3,9 @@ package com.thindie.simplyweather.data.mappers
 import com.thindie.simplyweather.data.dto.currentdto.Current
 import com.thindie.simplyweather.data.dto.dailydto.Daily
 import com.thindie.simplyweather.data.dto.hourlydto.Hourly
-import com.thindie.simplyweather.data.dto.placedetectiondto.PlacesDetectionDtoItem
 import com.thindie.simplyweather.domain.CurrentWeather
 import com.thindie.simplyweather.domain.DailyForecast
 import com.thindie.simplyweather.domain.HourlyForecast
-import com.thindie.simplyweather.domain.WeatherPlacePossibility
 import com.thindie.simplyweather.domain.WeeklyForecast
 
 fun Daily.toWeeklyForecast(
@@ -108,9 +106,3 @@ fun Hourly.toHourlyForecastList(): List<HourlyForecast> {
         }
     }
 }
-fun PlacesDetectionDtoItem.toWeatherPlacePossibility() = WeatherPlacePossibility(
-    displayName = displayName,
-    latitude = latitude,
-    longitude = longitude,
-    name = name
-)

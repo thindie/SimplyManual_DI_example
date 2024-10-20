@@ -1,12 +1,9 @@
 package com.thindie.simplyweather.presentation.add_place.screen
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +13,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -27,16 +22,12 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,14 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Alignment.Companion.Start
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -85,7 +74,6 @@ fun NavGraphBuilder.addPlaceScreen() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun Screen(viewModel: AddPlaceViewModel) {
     OnBackPressedHandler(onBack = { viewModel.onEvent(AddPlaceScreenEvent.OnClickBack) })
@@ -147,7 +135,7 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                             fontFamily = FontFamily.Monospace,
                         )
                         AssistChip(
-                            enabled = state.detectionPlaceTransitionState !is TransitionState.Loading,
+                            enabled = true,
                             modifier = Modifier
                                 .align(End)
                                 .padding(vertical = 24.dp),
@@ -218,16 +206,7 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                             }
                         )
                         HeightSpacer(dp = 8.dp)
-                        TextButton(
-                            enabled = state.placeTitle.length > 4 && state.placeTitle.isNotBlank(),
-                            onClick = {
-                                viewModel.onEvent(
-                                    AddPlaceScreenEvent.RequestPlaceDetection(state.placeTitle)
-                                )
-                            },
-                        ) {
-                            Text("Сыскать по названию")
-                        }
+
 
                         HeightSpacer(dp = 8.dp)
                         AppOutlinedTextField(
@@ -307,135 +286,6 @@ private fun Screen(viewModel: AddPlaceViewModel) {
                         title = "Принять"
                     )
                     HeightSpacer(dp = 16.dp)
-                }
-            }
-        }
-    }
-    when (state.detectionPlaceTransitionState) {
-        TransitionState.None -> {}
-        TransitionState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .align(Alignment.TopCenter),
-                )
-            }
-        }
-
-        else -> ModalBottomSheet(
-            onDismissRequest = { viewModel.onEvent(AddPlaceScreenEvent.DismissPlaceDetection) }
-        ) {
-            LazyColumn(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                when (state.detectionPlaceTransitionState) {
-                    TransitionState.Content -> {
-                        stickyHeader {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(72.dp)
-                                    .clip(MaterialTheme.shapes.large),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Место",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = "Координаты",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Light
-                                )
-                            }
-                        }
-                        items(
-                            items = state.weatherPlacePossibility,
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(72.dp)
-                                    .clip(MaterialTheme.shapes.large)
-                                    .clickable {
-                                        viewModel.onEvent(
-                                            AddPlaceScreenEvent.ApplyPlaceDetection(
-                                                it
-                                            )
-                                        )
-                                    },
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    modifier = Modifier,
-                                    text = it.displayName.take(15),
-                                    maxLines = 1,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                Text(
-                                    modifier = Modifier,
-                                    text = it.latitude.take(5),
-                                    maxLines = 1,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Thin,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                                Text(
-                                    modifier = Modifier,
-                                    text = it.longitude.take(5),
-                                    maxLines = 1,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Thin,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
-                            Divider(
-                                modifier = Modifier.fillMaxWidth(0.7f),
-                                thickness = Dp.Hairline
-                            )
-                        }
-                        item {
-                            HeightSpacer(dp = 72.dp)
-                        }
-                    }
-
-                    TransitionState.Error -> {
-                        item {
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                HeightSpacer(dp = 72.dp)
-                                Text(
-                                    text = "Похоже, ничего не нашлось",
-                                    fontWeight = FontWeight.Bold,
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                                HeightSpacer(dp = 8.dp)
-                                Text(
-                                    text = "Нужно уточнить запрос",
-                                    fontWeight = FontWeight.Medium,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                                HeightSpacer(dp = 72.dp)
-                            }
-
-                        }
-                    }
-
-                    else -> {}
-                }
-                item {
-                    HeightSpacer(dp = 72.dp)
                 }
             }
         }

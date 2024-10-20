@@ -7,7 +7,6 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.thindie.simplyweather.MainActivity
 import com.thindie.simplyweather.data.ApiService
-import com.thindie.simplyweather.data.PlaceDetectionApiService
 import com.thindie.simplyweather.data.WeatherRepositoryImpl
 import com.thindie.simplyweather.database.WeatherDb
 import com.thindie.simplyweather.domain.WeatherRepository
@@ -67,19 +66,6 @@ class DependenciesProvider private constructor(private val context: Context) {
         .baseUrl(BASE_URL)
         .build()
 
-    private val placeDetectionRetrofit =
-        Retrofit
-            .Builder()
-            .addConverterFactory(
-                json
-                    .asConverterFactory(
-                        "application/json; charset=UTF8"
-                            .toMediaType()
-                    )
-            )
-            .baseUrl("https://nominatim.openstreetmap.org")
-            .build()
-
     private fun getSqlDriver(context: Context): SqlDriver {
         return if (::sqlDriver.isInitialized) {
             sqlDriver
@@ -106,11 +92,9 @@ class DependenciesProvider private constructor(private val context: Context) {
     }
 
     private val apiService: ApiService = retrofit.create(ApiService::class.java)
-    private val placeDetection: PlaceDetectionApiService =
-        placeDetectionRetrofit.create(PlaceDetectionApiService::class.java)
 
     private val repository: WeatherRepository =
-        WeatherRepositoryImpl(apiService, placeDetection, getWeatherTitleDb())
+        WeatherRepositoryImpl(apiService, getWeatherTitleDb())
 
     val allPlacesViewModelFactory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
